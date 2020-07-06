@@ -42,6 +42,7 @@ struct lt8912 {
 	struct gpio_desc *hpd_gpio;
 	struct gpio_desc *reset_n;
 	struct i2c_adapter *ddc;        /* optional regular DDC I2C bus */
+	bool swap_mipi_pn;
 };
 
 static int lt8912_attach_dsi(struct lt8912 *lt);
@@ -113,7 +114,11 @@ static void lt8912_init(struct lt8912 *lt)
 	regmap_write(lt->regmap[0], 0x5a, 0x02);
 
 	/* MIPIAnalog */
-	regmap_write(lt->regmap[0], 0x3e, 0xce);
+	if(lt->swap_mipi_pn) {
+		regmap_write(lt->regmap[0], 0x3e, 0xf6);		// P/N mipi lines are swapped
+	} else {
+		regmap_write(lt->regmap[0], 0x3e, 0xce);
+	}
 	regmap_write(lt->regmap[0], 0x3f, 0xd4);
 	regmap_write(lt->regmap[0], 0x41, 0x3c);
 
@@ -605,6 +610,8 @@ static int lt8912_probe(struct i2c_client *i2c, const struct i2c_device_id *id)
 		dev_err(dev, "failed to request reset GPIO: %d\n", ret);
 		return ret;
 	}
+
+	lt->swap_mipi_pn = of_property_read_bool(dev->of_node, "swap-mipi-pn");
 
 	ret = lt8912_i2c_init(lt, i2c);
 	if (ret)
