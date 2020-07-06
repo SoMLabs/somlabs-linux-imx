@@ -13,6 +13,7 @@ Required properties and nodes:
 
 Optional properties:
  - reset-gpios: a GPIO spec for the reset pin
+ - swap-mipi-pn: set if MIPI data line P/N are swapped
 
 Examples:
 &i2c1 {
