@@ -499,6 +499,7 @@ config DRM_PANEL_XINPENG_XPP055C272
 	  Say Y here if you want to enable support for the Xinpeng
 	  XPP055C272 controller for 720x1280 LCD panels with MIPI/RGB/SPI
 	  system interfaces.
+
 config DRM_PANEL_WKS_101WX001
 	tristate "WKS 101WX001 parallel LCD"
 	depends on OF
@@ -508,4 +509,12 @@ config DRM_PANEL_WKS_101WX001
 	  Say Y here if you want to enable support for the WKS
 	  101WX001 controller for 1280x800 LCD panel
 
+config DRM_PANEL_POWERTIP_PH720128T003
+	tristate "Powertip PH720128T003 HD panel"
+	depends on OF
+	depends on DRM_MIPI_DSI
+	depends on BACKLIGHT_CLASS_DEVICE
+	help
+	  Say Y here if you want to enable support for Powertip PH720128T003 HD
+	  (720x1280) DSI panel.
 endmenu
