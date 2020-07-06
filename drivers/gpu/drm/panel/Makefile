@@ -66,3 +66,4 @@ obj-$(CONFIG_DRM_PANEL_VISIONOX_RM69299) += panel-visionox-rm69299.o
 obj-$(CONFIG_DRM_PANEL_WIDECHIPS_WS2401) += panel-widechips-ws2401.o
 obj-$(CONFIG_DRM_PANEL_XINPENG_XPP055C272) += panel-xinpeng-xpp055c272.o
 obj-$(CONFIG_DRM_PANEL_WKS_101WX001) += panel-wks-101wx001.o
+obj-$(CONFIG_DRM_PANEL_POWERTIP_PH720128T003) += panel-powertip-ph720128T003.o
