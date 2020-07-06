@@ -1565,6 +1565,9 @@ static int ov5647_probe(struct i2c_client *client,
 	/* request power down pin */
 	pwn_gpio = of_get_named_gpio(dev->of_node, "pwn-gpios", 0);
 	if (!gpio_is_valid(pwn_gpio)) {
+		if (rst_gpio == -EPROBE_DEFER) {
+			return -EPROBE_DEFER;
+		}
 		dev_warn(dev, "no sensor pwdn pin available\n");
 		pwn_gpio = -1;
 	} else {
@@ -1579,6 +1582,9 @@ static int ov5647_probe(struct i2c_client *client,
 	/* request reset pin */
 	rst_gpio = of_get_named_gpio(dev->of_node, "rst-gpios", 0);
 	if (!gpio_is_valid(rst_gpio)) {
+		if (rst_gpio == -EPROBE_DEFER) {
+			return -EPROBE_DEFER;
+		}
 		dev_warn(dev, "no sensor reset pin available\n");
 		rst_gpio = -1;
 	} else {
