@@ -408,7 +408,11 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ulz-14x14-evk-btwifi.dtb \
 	imx6ulz-14x14-evk-emmc.dtb \
 	imx6ulz-14x14-evk-gpmi-weim.dtb \
-	imx6ulz-bsh-smm-m2.dtb
+	imx6ulz-bsh-smm-m2.dtb \
+	visioncb-6ull-std-emmc.dtb \
+	visioncb-6ull-std-emmc-btwifi.dtb \
+	visioncb-6ull-std-sd.dtb \
+	visioncb-6ull-std-sd-btwifi.dtb
 
 imx6ul-14x14-evk-reve-dtbs := imx6ul-14x14-evk.dtb imx6ul-14x14-evk-reve.dtbo
 imx6ul-14x14-evk-reve-csi-dtbs := imx6ul-14x14-evk-csi.dtb imx6ul-14x14-evk-reve.dtbo
