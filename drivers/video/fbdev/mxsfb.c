@@ -2329,6 +2329,9 @@ static int mxsfb_probe(struct platform_device *pdev)
 	int irq = platform_get_irq(pdev, 0);
 	int gpio, ret;
 
+	struct device_node *backlight_np;
+	struct backlight_device* backlight_dev;
+
 	if (of_id)
 		pdev->id_entry = of_id->data;
 
@@ -2481,6 +2484,13 @@ static int mxsfb_probe(struct platform_device *pdev)
 	ret = device_create_file(fb_info->dev, &dev_attr_vsync);
 	if (ret)
 		dev_err(&pdev->dev, "Failed to create vsync file\n");
+
+	backlight_np = of_parse_phandle(pdev->dev.of_node, "backlight", 0);
+	if (backlight_np) {
+		backlight_dev = of_find_backlight_by_node(backlight_np);
+		if (backlight_dev)
+			backlight_device_set_brightness(backlight_dev, 1);
+	}
 
 	dev_info(&pdev->dev, "initialized\n");
 
