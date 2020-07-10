@@ -1,0 +1,16 @@
+/*
+ * Copyright (C) 2020 SoMLabs
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "visionsom-6ull-emmc.dtsi"
+#include "visionsom-6ull-btwifi.dtsi"
+#include "visioncb-6ull-std.dtsi"
+
+/ {
+        model = "SoMLabs VisionCB-6ULL-STD-EMMC-BTWIFI";
+};
+
