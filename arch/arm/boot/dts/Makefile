@@ -700,7 +700,11 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ulz-14x14-evk-btwifi.dtb \
 	imx6ulz-14x14-evk-btwifi-sdio3_0.dtb \
 	imx6ulz-14x14-evk-gpmi-weim.dtb \
-	imx6ulz-14x14-evk-emmc.dtb
+	imx6ulz-14x14-evk-emmc.dtb \
+	visioncb-6ull-std-emmc.dtb \
+	visioncb-6ull-std-emmc-btwifi.dtb \
+	visioncb-6ull-std-sd.dtb \
+	visioncb-6ull-std-sd-btwifi.dtb
 dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-cl-som-imx7.dtb \
 	imx7d-colibri-aster.dtb \
