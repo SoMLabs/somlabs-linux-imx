@@ -63,7 +63,12 @@ static int gpio_backlight_probe_dt(struct platform_device *pdev,
 
 	gbl->def_value = device_property_read_bool(dev, "default-on");
 
-	gbl->gpiod = devm_gpiod_get(dev, NULL, GPIOD_ASIS);
+	if (gbl->def_value) {
+		gbl->gpiod = devm_gpiod_get(dev, NULL, GPIOD_OUT_HIGH);
+	} else {
+		gbl->gpiod = devm_gpiod_get(dev, NULL, GPIOD_OUT_LOW);
+	}
+
 	if (IS_ERR(gbl->gpiod)) {
 		ret = PTR_ERR(gbl->gpiod);
 
@@ -84,10 +89,6 @@ static int gpio_backlight_initial_power_state(struct gpio_backlight *gbl)
 	/* Not booted with device tree or no phandle link to the node */
 	if (!node || !node->phandle)
 		return gbl->def_value ? FB_BLANK_UNBLANK : FB_BLANK_POWERDOWN;
-
-	/* if the enable GPIO is disabled, do not enable the backlight */
-	if (gpiod_get_value_cansleep(gbl->gpiod) == 0)
-		return FB_BLANK_POWERDOWN;
 
 	return FB_BLANK_UNBLANK;
 }
