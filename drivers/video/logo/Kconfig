@@ -70,6 +70,10 @@ config LOGO_SUPERH_CLUT224
 
 config LOGO_SOMLABS_800_480_CLUT224
 	bool "224-color SoMLabs Linux logo for 800x480 display"
-	default y
+	default n
+
+config LOGO_SOMLABS_1280_720_CLUT224
+	bool "224-color SoMLabs Linux logo for 1280x720 display"
+	default n
 
 endif # LOGO

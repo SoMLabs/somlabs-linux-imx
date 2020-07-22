@@ -104,6 +104,10 @@ const struct linux_logo * __ref fb_find_logo(int depth)
 		/* SoMLabs Linux 800x480 logo */
 		logo = &logo_somlabs_800_480_clut224;
 #endif
+#ifdef CONFIG_LOGO_SOMLABS_1280_720_CLUT224
+		/* SoMLabs Linux 1280x720 logo */
+		logo = &logo_somlabs_1280_720_clut224;
+#endif
 	}
 	return logo;
 }
