@@ -14,6 +14,7 @@ obj-$(CONFIG_LOGO_SUPERH_MONO)		+= logo_superh_mono.o
 obj-$(CONFIG_LOGO_SUPERH_VGA16)		+= logo_superh_vga16.o
 obj-$(CONFIG_LOGO_SUPERH_CLUT224)	+= logo_superh_clut224.o
 obj-$(CONFIG_LOGO_SOMLABS_800_480_CLUT224) += logo_somlabs_800_480_clut224.o
+obj-$(CONFIG_LOGO_SOMLABS_1280_720_CLUT224) += logo_somlabs_1280_720_clut224.o
 
 obj-$(CONFIG_SPU_BASE)			+= logo_spe_clut224.o
 
