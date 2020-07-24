@@ -40,14 +40,6 @@
         };
     };
 
-    modem_reset: modem-reset {      /* BT REG ENABLE */
-        compatible = "gpio-reset";
-        reset-gpios = <&gpio4 26 GPIO_ACTIVE_LOW>;
-        reset-delay-us = <2000>;
-        reset-post-delay-ms = <40>;
-        #reset-cells = <0>;
-    };
-
     wlan_pwrseq: wlanpwrseq {
         compatible = "mmc-pwrseq-simple";
         pinctrl-names = "default";
@@ -374,17 +366,14 @@
     assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
     fsl,dte-mode;
     fsl,uart-has-rtscts;
-    resets = <&modem_reset>;
     status = "okay";
-    // dma-names = "", "";
+    dma-names = "", "";
 
-    // bluetooth {
-    //     compatible = "brcm,bcm43438-bt";
-    //     max-speed = <3000000>;
-    //     shutdown-gpios = <&gpio4 26 GPIO_ACTIVE_HIGH>;
-    //     device-wakeup-gpios = <&gpio4 20 GPIO_ACTIVE_HIGH>;
-    //     host-wakeup-gpios = <&gpio4 25 GPIO_ACTIVE_HIGH>;
-    // };
+    bluetooth {
+        compatible = "brcm,bcm43438-bt";
+        max-speed = <3000000>;
+        shutdown-gpios = <&gpio4 26 GPIO_ACTIVE_HIGH>;
+    };
 };
 
 &uart2 {
