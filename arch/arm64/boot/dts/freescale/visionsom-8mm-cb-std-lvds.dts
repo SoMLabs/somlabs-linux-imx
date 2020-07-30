@@ -6,7 +6,7 @@
 
 /dts-v1/;
 
-#include "visionsom-8mm-cb.dtsi"
+#include "visionsom-8mm-cb-std.dtsi"
 #include "visionsom-8mm-cb-lvds.dtsi"
 
 / {
@@ -14,16 +14,14 @@
 };
 
 &iomuxc {
-    pinctrl-names = "default";
 
-    visionsom-imx8mm-cb-std-lvds {
-        pinctrl_mipi2hdmi_std: mipi2hdmi {
-            fsl,pins = <
-                MX8MM_IOMUXC_UART1_TXD_GPIO5_IO23       0x81        /* interrupt */
-                MX8MM_IOMUXC_SAI3_RXFS_GPIO4_IO28       0x19        /* reset */
-            >;
-        };
+    pinctrl_mipi2hdmi_std: mipi2hdmi {
+        fsl,pins = <
+            MX8MM_IOMUXC_UART1_TXD_GPIO5_IO23       0x81        /* interrupt */
+            MX8MM_IOMUXC_SAI3_RXFS_GPIO4_IO28       0x19        /* reset */
+        >;
     };
+
 };
 
 &i2c2 {
