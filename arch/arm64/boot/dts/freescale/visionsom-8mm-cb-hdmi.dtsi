@@ -7,12 +7,18 @@
 #include "visionsom-8mm-cb-lt8912.dtsi"
 
 / {
-    // sound-spdif {
-    //     compatible = "fsl,imx-audio-spdif";
-    //     model = "imx-spdif";
-    //     spdif-controller = <&spdif1>;
-    //     spdif-out;
-    // };
+    hdmi_audio {
+        compatible = "fsl,imx-audio-spdif";
+        model = "hdmi-audio";
+        spdif-controller = <&spdif1>;
+        spdif-out;
+
+        port {
+            spdif_audio_out: endpoint {
+                remote-endpoint = <&lt8912_audio_in>;
+            };
+        };
+    };
 
     hdmi {
         compatible = "hdmi-connector";
@@ -28,18 +34,19 @@
 };
 
 &iomuxc {
-    pinctrl-names = "default";
 
     pinctrl_spdif1: spdif1grp {
         fsl,pins = <
             MX8MM_IOMUXC_SPDIF_TX_SPDIF1_OUT    0xd6
         >;
     };
+
 };
 
 &i2c2 {
     /* MIPI-DSI to HDMI adapter */
     mipi_dsi_hdmi: lt8912@48 {
+
         ports {
             port@1 {
                 reg = <1>;
@@ -72,10 +79,4 @@
     clock-names = "core", "rxtx0", "rxtx1", "rxtx2", "rxtx3",
         "rxtx4", "rxtx5", "rxtx6", "rxtx7", "spba", "pll8k", "pll11k";
     status = "okay";
-
-    port {
-        spdif_audio_out: endpoint {
-            remote-endpoint = <&lt8912_audio_in>;
-        };
-    };
 };
