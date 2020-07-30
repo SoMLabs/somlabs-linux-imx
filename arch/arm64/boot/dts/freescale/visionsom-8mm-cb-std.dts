@@ -4,31 +4,26 @@
  *
  */
 
-/dts-v1/;
-
-#include "visionsom-8mm-cb.dtsi"
+#include "visionsom-8mm-cb-std.dtsi"
+#include "visionsom-8mm-cb-mipi.dtsi"
 
 / {
     model = "SoMLabs VisionSOM i.MX8MM CB-STD";
 };
 
 &iomuxc {
-    pinctrl-names = "default";
 
-    visionsom-imx8mm-cb-std {
-
-        pinctrl_panel_reset_std: panel_reset {
-            fsl,pins = <
-                MX8MM_IOMUXC_SAI3_RXFS_GPIO4_IO28       0x19
-            >;
-        };
+    pinctrl_panel_reset_std: panel_reset {
+        fsl,pins = <
+            MX8MM_IOMUXC_SAI3_RXFS_GPIO4_IO28       0x19
+        >;
     };
+
 };
 
 &mipi_dsi {
-    status = "okay";
-
     panel@0 {
+        pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_panel_reset_std>;
         reset-gpios = <&gpio4 28 GPIO_ACTIVE_LOW>;
     };
