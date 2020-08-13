@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright 2020 SomLabs
+ *
+ */
+
+/ {
+    /delete-node/ panel-backlight;
+
+};
+
+&pwm2 {
+    status = "disabled";
+};
+
+&i2c2 {
+    /delete-node/ edt-ft5x06@38;
+
+    /* MIPI-DSI to HDMI adapter */
+    mipi_dsi_hdmi: lt8912@48 {
+        compatible = "lontium,lt8912";
+        reg = <0x48>;
+        ddc-i2c-bus = <&i2c2>;
+        status = "okay";
+        ports {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            port@0 {
+                reg = <0>;
+                lt8912_in: endpoint {
+                    remote-endpoint = <&mipi_dsi_out>;
+                };
+            };
+        };
+    };
+};
+
+&mipi_dsi {
+    status = "okay";
+
+    /delete-node/ panel@0;
+
+    port@1 {
+        mipi_dsi_out: endpoint {
+            remote-endpoint = <&lt8912_in>;
+            attach-bridge;
+        };
+    };
+};
