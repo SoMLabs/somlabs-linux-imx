@@ -1,0 +1,38 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright 2020 SomLabs
+ *
+ */
+
+/dts-v1/;
+
+#include "visionsom-8mm-cb-adv.dts"
+#include "visionsom-8mm-cb-lvds.dtsi"
+
+/ {
+    model = "SoMLabs VisionSOM i.MX8MM CB-ADV/LVDS";
+};
+
+&iomuxc {
+    pinctrl-names = "default";
+
+    visionsom-imx8mm-cb-adv-lvds {
+
+        pinctrl_mipi2hdmi_adv: mipi2hdmi {
+            fsl,pins = <
+                MX8MM_IOMUXC_UART1_TXD_GPIO5_IO23       0x81        /* interrupt */
+                MX8MM_IOMUXC_UART1_RXD_GPIO5_IO22       0x19        /* reset */
+            >;
+        };
+    };
+};
+
+&i2c2 {
+
+    /* MIPI-DSI to HDMI/LVDS adapter */
+    mipi_dsi_hdmi: lt8912@48 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_mipi2hdmi_adv>;
+        reset-gpios = <&gpio5 22 GPIO_ACTIVE_LOW>;
+    };
+};
