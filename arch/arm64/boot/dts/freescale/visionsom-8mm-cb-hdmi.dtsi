@@ -4,17 +4,28 @@
  *
  */
 
+#include "visionsom-8mm-cb-lt8912.dtsi"
+
 / {
-    /delete-node/ panel-backlight;
+    // sound-spdif {
+    //     compatible = "fsl,imx-audio-spdif";
+    //     model = "imx-spdif";
+    //     spdif-controller = <&spdif1>;
+    //     spdif-out;
+    // };
 
-    sound-spdif {
-        compatible = "fsl,imx-audio-spdif";
-        model = "imx-spdif";
-        spdif-controller = <&spdif1>;
-        spdif-out;
+    hdmi {
+        compatible = "hdmi-connector";
+        type = "a";
+
+        port {
+            hdmi_connector_in: endpoint {
+                remote-endpoint = <&lt8912_hdmi_out>;
+            };
+        };
     };
-};
 
+};
 
 &iomuxc {
     pinctrl-names = "default";
@@ -26,37 +37,22 @@
     };
 };
 
-&pwm2 {
-    status = "disabled";
-};
-
 &i2c2 {
-    /delete-node/ edt-ft5x06@38;
-
     /* MIPI-DSI to HDMI adapter */
     mipi_dsi_hdmi: lt8912@48 {
-        compatible = "lontium,lt8912";
-        reg = <0x48>;
-        ddc-i2c-bus = <&i2c2>;
-        status = "okay";
-
-        port {
-            lt8912_1_in: endpoint {
-                remote-endpoint = <&mipi_dsi_bridge1_out>;
+        ports {
+            port@1 {
+                reg = <1>;
+                lt8912_hdmi_out: endpoint {
+                    remote-endpoint = <&hdmi_connector_in>;
+                };
             };
-        };
-    };
-};
-
-&mipi_dsi {
-    status = "okay";
-
-    /delete-node/ panel@0;
-
-    port@1 {
-        mipi_dsi_bridge1_out: endpoint {
-            remote-endpoint = <&lt8912_1_in>;
-            attach-bridge;
+            port@3 {
+                reg = <3>;
+                lt8912_audio_in: endpoint {
+                    remote-endpoint = <&spdif_audio_out>;
+                };
+            };
         };
     };
 };
@@ -76,4 +72,10 @@
     clock-names = "core", "rxtx0", "rxtx1", "rxtx2", "rxtx3",
         "rxtx4", "rxtx5", "rxtx6", "rxtx7", "spba", "pll8k", "pll11k";
     status = "okay";
+
+    port {
+        spdif_audio_out: endpoint {
+            remote-endpoint = <&lt8912_audio_in>;
+        };
+    };
 };

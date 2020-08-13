@@ -170,7 +170,7 @@
     assigned-clocks = <&clk IMX8MM_CLK_SAI3>;
     assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
     assigned-clock-rates = <12288000>;
-    fsl,dataline =  <0 0x03 0x01>;
+    fsl,dataline =  <1 0x02 0x01>;
     status = "okay";
 };
 
