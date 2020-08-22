@@ -296,7 +296,7 @@ static int ph720128t003_init(struct mipi_dsi_device *dsi)
 						      instr->data);
 		}
 		if (ret < 0) {
-			dev_err(&dsi->dev, "Error when setting device @ %u (cmd: %08X)\n", i, instr->cmd);
+			dev_err(&dsi->dev, "Error when setting device @ %lu (cmd: %08X)\n", i, instr->cmd);
 			return ret;
 		}
 	}
@@ -305,21 +305,6 @@ static int ph720128t003_init(struct mipi_dsi_device *dsi)
 	}
 	return ret;
 }
-
-static int color_format_from_dsi_format(enum mipi_dsi_pixel_format format)
-{
-	switch (format) {
-	case MIPI_DSI_FMT_RGB565:
-		return 0x55;
-	case MIPI_DSI_FMT_RGB666:
-	case MIPI_DSI_FMT_RGB666_PACKED:
-		return 0x66;
-	case MIPI_DSI_FMT_RGB888:
-		return 0x77;
-	default:
-		return 0x77; /* for backward compatibility */
-	}
-};
 
 static int ph720128t003_prepare(struct drm_panel *panel)
 {
@@ -367,7 +352,6 @@ static int ph720128t003_enable(struct drm_panel *panel)
 	struct ph720128t003 *ctx = panel_to_ph720128t003(panel);
 	struct mipi_dsi_device *dsi = ctx->dsi;
 	struct device *dev = &dsi->dev;
-	int color_format = color_format_from_dsi_format(dsi->format);
 	u16 brightness;
 	int ret;
 	u8 buf[2] = {0};
@@ -413,7 +397,7 @@ static int ph720128t003_enable(struct drm_panel *panel)
 	backlight_enable(ctx->backlight);
 
 	ctx->enabled = true;
-	dsi->mode_flags &= MIPI_DSI_MODE_LPM;
+	dsi->mode_flags &= ~MIPI_DSI_MODE_LPM;
 
 	return 0;
 fail:
@@ -512,35 +496,17 @@ static const struct drm_panel_funcs ph720128t003_funcs = {
 };
 
 /*
-static const struct drm_display_mode ph720128t003_default_mode = {
-	.clock		= 54000,
-	.vrefresh	= 40,
-
-	.hdisplay	= 720,
-	.hsync_start	= 720 + 20,
-	.hsync_end	= 720 + 20 + 60,
-	.htotal		= 720 + 20 + 60 + 20,
-
-	.vdisplay	= 1280,
-	.vsync_start	= 1280 + 10,
-	.vsync_end	= 1280 + 10 + 2,
-	.vtotal		= 1280 + 10 + 2 + 15,
-	.flags		= 0,
-};
-*/
-
-/*
  */
 static const struct display_timing ph720128t003_default_timing = {
-	.pixelclock = { 54000000, 55000000, 56000000},
-	.hactive = { 720, 720, 720 },
-	.hfront_porch = { 20, 20 , 20 },
-	.hsync_len = { 60, 60, 60 },
-	.hback_porch = { 20, 20, 20 },
-	.vactive = { 1280, 1280, 1280 },
-	.vfront_porch = { 10, 10, 10 },
-	.vsync_len = { 2, 2, 2 },
-	.vback_porch = { 15, 15, 15 },
+	.pixelclock.typ   = 54000000,
+	.hactive.typ      = 720,
+	.hfront_porch.typ = 20,
+	.hsync_len.typ    = 60,
+	.hback_porch.typ  = 20,
+	.vactive.typ      = 1280,
+	.vfront_porch.typ = 10,
+	.vsync_len.typ    = 2,
+	.vback_porch.typ  = 15,
 	.flags = DISPLAY_FLAGS_HSYNC_LOW |
 		 DISPLAY_FLAGS_VSYNC_LOW |
 		 DISPLAY_FLAGS_DE_LOW |
