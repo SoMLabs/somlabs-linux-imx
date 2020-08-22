@@ -65,6 +65,7 @@ dtb-$(CONFIG_ARCH_MXC) += visionsom-8mm-cb-std.dtb \
                           visionsom-8mm-cb-adv-mipi10.dtb \
                           visionsom-8mm-cb-adv-hdmi.dtb \
                           visionsom-8mm-cb-adv-lvds.dtb \
+			  visionsbc-8mmini.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += imx8mm-evk-ak4497.dtb imx8mm-evk-ak5558.dtb imx8mm-evk-audio-tdm.dtb \
 			  imx8mm-ddr4-evk-no-dynamic_partition.dtb imx8mm-ddr4-evk-no-product-no-dynamic_partition.dtb \
