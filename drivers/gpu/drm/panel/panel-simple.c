@@ -4591,6 +4591,37 @@ static const struct panel_desc_dsi osd101t2045_53ts = {
 	.lanes = 4,
 };
 
+static const struct drm_display_mode ph128800t004_mode = {
+	.clock = 74250,
+	.vrefresh = 60,
+	.hdisplay = 1280,
+	.hsync_start = 1280 + 80,
+	.hsync_end = 1280 + 8 + 80,
+	.htotal = 1280 + 8 + 45 + 80,
+	.vdisplay = 800,
+	.vsync_start = 800 + 8,
+	.vsync_end = 800 + 8 + 20,
+	.vtotal = 800 + 8 + 20 + 20,
+	.flags = DRM_MODE_FLAG_NVSYNC | DRM_MODE_FLAG_NHSYNC,
+};
+
+static const struct panel_desc_dsi ph128800t004 = {
+	.desc = {
+		.modes = &ph128800t004_mode,
+		.num_modes = 1,
+		.bpc = 8,
+		.size = {
+			.width = 217,
+			.height = 136,
+		},
+		.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+		.bus_flags = DRM_BUS_FLAG_DE_LOW | DRM_BUS_FLAG_PIXDATA_DRIVE_NEGEDGE,
+	},
+	.flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_SYNC_PULSE | MIPI_DSI_MODE_LPM,
+	.format = MIPI_DSI_FMT_RGB888,
+	.lanes = 2,
+};
+
 static const struct of_device_id dsi_of_match[] = {
 	{
 		.compatible = "auo,b080uan01",
@@ -4613,6 +4644,9 @@ static const struct of_device_id dsi_of_match[] = {
 	}, {
 		.compatible = "osddisplays,osd101t2045-53ts",
 		.data = &osd101t2045_53ts
+	}, {
+		.compatible = "powertip,ph128800t004",
+		.data = &ph128800t004
 	}, {
 		/* sentinel */
 	}
