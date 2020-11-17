@@ -5,10 +5,7 @@
  */
 
 #include "visionsom-8mm-cb-adv.dtsi"
-
-/ {
-    model = "SoMLabs VisionSOM i.MX8MM CB-ADV";
-};
+#include "visionsom-8mm-cb-mipi.dtsi"
 
 &iomuxc {
 
