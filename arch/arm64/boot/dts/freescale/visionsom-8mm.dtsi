@@ -109,6 +109,12 @@
         };
     };
 
+    bt_rfkill {
+        compatible = "fsl,mxc_bt_rfkill";
+        bt-power-gpios = <&gpio4 26 GPIO_ACTIVE_LOW>;
+        status ="okay";
+    };
+
     wlan_pwrseq: wlanpwrseq {
         compatible = "mmc-pwrseq-simple";
         pinctrl-names = "default";
@@ -172,7 +178,7 @@
             MX8MM_IOMUXC_SAI2_RXC_UART1_TX          0x140
             MX8MM_IOMUXC_SAI2_RXD0_UART1_CTS_B      0x140
             MX8MM_IOMUXC_SAI2_TXFS_UART1_RTS_B      0x140
-            MX8MM_IOMUXC_SAI1_MCLK_GPIO4_IO20       0x19       /* BT dev wakeup */
+            MX8MM_IOMUXC_SAI2_MCLK_GPIO4_IO27       0x19       /* BT dev wakeup */
             MX8MM_IOMUXC_SAI2_TXC_GPIO4_IO25        0x19       /* BT host wakeup */
             MX8MM_IOMUXC_SAI2_TXD0_GPIO4_IO26       0x19       /* BT Enable */
         >;
@@ -433,12 +439,6 @@
     fsl,uart-has-rtscts;
     status = "okay";
     dma-names = "", "";
-
-    bluetooth {
-        compatible = "brcm,bcm43438-bt";
-        max-speed = <3000000>;
-        shutdown-gpios = <&gpio4 26 GPIO_ACTIVE_HIGH>;
-    };
 };
 
 &uart2 {
