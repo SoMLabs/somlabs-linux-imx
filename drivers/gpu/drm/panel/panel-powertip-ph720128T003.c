@@ -498,7 +498,7 @@ static const struct drm_panel_funcs ph720128t003_funcs = {
 /*
  */
 static const struct display_timing ph720128t003_default_timing = {
-	.pixelclock.typ   = 54000000,
+	.pixelclock.typ   = 55000000,
 	.hactive.typ      = 720,
 	.hfront_porch.typ = 20,
 	.hsync_len.typ    = 60,
