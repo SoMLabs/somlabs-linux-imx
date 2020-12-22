@@ -1749,8 +1749,7 @@ static int ov5640_probe(struct i2c_client *client,
 	if (IS_ERR(sensor->sensor_clk)) {
 		/* assuming clock enabled by default */
 		sensor->sensor_clk = NULL;
-		dev_err(dev, "clock-frequency missing or invalid\n");
-		return PTR_ERR(sensor->sensor_clk);
+		dev_warn(dev, "clock-frequency missing or invalid\n");
 	}
 
 	retval = of_property_read_u32(dev->of_node, "mclk",
@@ -1766,8 +1765,7 @@ static int ov5640_probe(struct i2c_client *client,
 	retval = of_property_read_u32(dev->of_node, "mclk_source",
 					(u32 *) &(sensor->mclk_source));
 	if (retval) {
-		dev_err(dev, "mclk_source missing or invalid\n");
-		return retval;
+		dev_warn(dev, "mclk_source missing or invalid\n");
 	}
 
 	retval = of_property_read_u32(dev->of_node, "csi_id",
@@ -1777,7 +1775,8 @@ static int ov5640_probe(struct i2c_client *client,
 		return retval;
 	}
 
-	clk_prepare_enable(sensor->sensor_clk);
+	if(sensor->sensor_clk)
+		clk_prepare_enable(sensor->sensor_clk);
 
 	sensor->io_init = ov5640_reset;
 	sensor->i2c_client = client;
