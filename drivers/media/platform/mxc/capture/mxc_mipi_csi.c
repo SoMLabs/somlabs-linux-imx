@@ -278,6 +278,8 @@ struct csi_state {
 	u32 num_lanes;
 	u32 max_num_lanes;
 	u8 wclk_ext;
+	u8 swap_clk;
+	u8 swap_data;
 
 	const struct csis_pix_format *csis_fmt;
 	struct v4l2_mbus_framefmt format;
@@ -491,6 +493,21 @@ static void mipi_csis_set_hsync_settle(struct csi_state *state,
 	mipi_csis_write(state, MIPI_CSIS_DPHYCTRL, val);
 }
 
+static void mipi_csis_set_set_data_clock_polarity(struct csi_state *state)
+{
+	u32 val = mipi_csis_read(state, MIPI_CSIS_DPHYCTRL);
+
+	val &= ~(MIPI_CSIS_DPHYCTRL_DPDN_SWAP_CLK | MIPI_CSIS_DPHYCTRL_DPDN_SWAP_DAT);
+
+	if(state->swap_clk)
+		val |= MIPI_CSIS_DPHYCTRL_DPDN_SWAP_CLK;
+
+	if(state->swap_data)
+		val |= MIPI_CSIS_DPHYCTRL_DPDN_SWAP_DAT;
+
+	mipi_csis_write(state, MIPI_CSIS_DPHYCTRL, val);
+}
+
 static void mipi_csis_set_params(struct csi_state *state)
 {
 	u32 val;
@@ -503,6 +520,8 @@ static void mipi_csis_set_params(struct csi_state *state)
 	__mipi_csis_set_format(state);
 
 	mipi_csis_set_hsync_settle(state, state->hs_settle, state->clk_settle);
+
+	mipi_csis_set_set_data_clock_polarity(state);
 
 	val = mipi_csis_read(state, MIPI_CSIS_ISPCONFIG_CH0);
 	if (state->csis_fmt->data_alignment == 32)
@@ -974,6 +993,12 @@ static int mipi_csis_parse_dt(struct platform_device *pdev,
 
 	of_property_read_u32(node, "data-lanes",
 					&state->num_lanes);
+
+	state->swap_data = of_property_read_bool(node,
+					"swap-data");
+	state->swap_clk = of_property_read_bool(node,
+					"swap-clk");
+
 	of_node_put(node);
 
 	return 0;
