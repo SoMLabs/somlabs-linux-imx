@@ -103,7 +103,7 @@
             MX8MM_IOMUXC_SAI2_RXC_UART1_TX          0x140
             MX8MM_IOMUXC_SAI2_RXD0_UART1_CTS_B      0x140
             MX8MM_IOMUXC_SAI2_TXFS_UART1_RTS_B      0x140
-            MX8MM_IOMUXC_SAI1_MCLK_GPIO4_IO20       0x19       /* BT dev wakeup */
+            MX8MM_IOMUXC_SAI2_MCLK_GPIO4_IO27       0x19       /* BT dev wakeup */
             MX8MM_IOMUXC_SAI2_TXC_GPIO4_IO25        0x19       /* BT host wakeup */
             MX8MM_IOMUXC_SAI2_TXD0_GPIO4_IO26       0x19       /* BT Enable */
         >;
