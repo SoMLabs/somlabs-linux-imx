@@ -411,6 +411,8 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ulz-bsh-smm-m2.dtb \
 	visioncb-6ull-std-emmc.dtb \
 	visioncb-6ull-std-emmc-btwifi.dtb \
+	visioncb-6ull-std-nand.dtb \
+	visioncb-6ull-std-nand-btwifi.dtb \
 	visioncb-6ull-std-sd.dtb \
 	visioncb-6ull-std-sd-btwifi.dtb
 
