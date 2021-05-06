@@ -43,26 +43,27 @@
 
         switch1 {
             label = "BTN-IO-00";
-            linux,code = <0x100>;
+            linux,code = <KEY_POWER>;
             gpios = <&gpio4 0 GPIO_ACTIVE_LOW>;
+            gpio-key,wakeup;
         };
 
         switch2 {
             label = "BTN-IO-01";
-            linux,code = <0x101>;
+            linux,code = <KEY_MUTE>;
             gpios = <&gpio4 1 GPIO_ACTIVE_LOW>;
         };
 
         switch3 {
             label = "BTN-IO-02";
-            linux,code = <0x102>;
+            linux,code = <KEY_VOLUMEUP>;
             gpios = <&gpio4 2 GPIO_ACTIVE_LOW>;
             wakeup-source;
         };
 
         switch4 {
             label = "BTN-IO-00";
-            linux,code = <0x103>;
+            linux,code = <KEY_VOLUMEDOWN>;
             gpios = <&gpio4 3 GPIO_ACTIVE_LOW>;
         };
     };
