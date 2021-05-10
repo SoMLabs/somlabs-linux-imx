@@ -5,3 +5,60 @@
  */
 
 #include "visionsom-8mm-cb.dtsi"
+
+&iomuxc {
+    pinctrl_csi: csi_grp {
+        fsl,pins = <
+            MX8MM_IOMUXC_SAI3_TXFS_GPIO4_IO31                  0x19
+            MX8MM_IOMUXC_SAI3_TXC_GPIO5_IO0                    0x19
+        >;
+    };
+};
+
+&i2c2 {
+    ov5640_mipi: ov5640_mipi@3c {
+        compatible = "ovti,ov5640_mipi";
+        reg = <0x3c>;
+        status = "okay";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_csi>;
+        csi_id = <0>;
+        pwn-gpios = <&gpio5 0 GPIO_ACTIVE_HIGH>;
+        rst-gpios = <&gpio4 31 GPIO_ACTIVE_LOW>;
+        mclk = <24000000>;
+        port {
+            ov5640_mipi1_ep: endpoint {
+                remote-endpoint = <&mipi1_sensor_ep>;
+            };
+        };
+    };
+};
+
+&csi1_bridge {
+    fsl,mipi-mode;
+    status = "okay";
+    port {
+        csi1_ep: endpoint {
+            remote-endpoint = <&csi1_mipi_ep>;
+        };
+    };
+};
+
+&mipi_csi_1 {
+    #address-cells = <1>;
+    #size-cells = <0>;
+    status = "okay";
+    port {
+        mipi1_sensor_ep: endpoint@1 {
+            remote-endpoint = <&ov5640_mipi1_ep>;
+            data-lanes = <2>;
+            csis-hs-settle = <13>;
+            csis-clk-settle = <2>;
+            csis-wclk;
+        };
+
+        csi1_mipi_ep: endpoint@2 {
+            remote-endpoint = <&csi1_ep>;
+        };
+    };
+};
