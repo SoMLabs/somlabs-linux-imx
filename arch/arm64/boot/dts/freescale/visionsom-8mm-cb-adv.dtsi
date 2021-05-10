@@ -71,9 +71,10 @@
         >;
     };
 
-    pinctrl_csi_pwn: camera_pwn {
+    pinctrl_csi: csi_grp {
         fsl,pins = <
             MX8MM_IOMUXC_SAI1_RXD6_GPIO4_IO8           0x19
+            MX8MM_IOMUXC_SAI1_RXD7_GPIO4_IO9           0x19
         >;
     };
 
@@ -178,18 +179,19 @@
         #sound-dai-cells = <0>;
     };
 
-    ov5647_mipi: ov5647_mipi@36 {
-        compatible = "ovti,ov5647_mipi";
-        reg = <0x36>;
-        status = "disabled";            // disabled for now
+    ov5640_mipi: ov5640_mipi@3c {
+        compatible = "ovti,ov5640_mipi";
+        reg = <0x3c>;
+        status = "okay";
         pinctrl-names = "default";
-        pinctrl-0 = <&pinctrl_csi_pwn>;
+        pinctrl-0 = <&pinctrl_csi>;
         csi_id = <0>;
+        pwn-gpios = <&gpio4 9 GPIO_ACTIVE_HIGH>;
         rst-gpios = <&gpio4 8 GPIO_ACTIVE_LOW>;
         mclk = <24000000>;
         mclk_source = <0>;
         port {
-            ov5647_mipi1_ep: endpoint {
+            ov5640_mipi1_ep: endpoint {
                 remote-endpoint = <&mipi1_sensor_ep>;
             };
         };
@@ -206,10 +208,10 @@
 &mipi_csi_1 {
     #address-cells = <1>;
     #size-cells = <0>;
-    status = "disabled";
+    status = "okay";
     port {
         mipi1_sensor_ep: endpoint@1 {
-            remote-endpoint = <&ov5647_mipi1_ep>;
+            remote-endpoint = <&ov5640_mipi1_ep>;
             data-lanes = <2>;
             csis-hs-settle = <13>;
             csis-clk-settle = <2>;
