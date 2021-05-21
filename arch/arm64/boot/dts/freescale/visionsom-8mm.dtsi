@@ -112,6 +112,8 @@
     bt_rfkill {
         compatible = "fsl,mxc_bt_rfkill";
         bt-power-gpios = <&gpio4 26 GPIO_ACTIVE_LOW>;
+        reset-delay-us = <2000>;
+        reset-post-delay-ms = <40>;
         status ="okay";
     };
 
