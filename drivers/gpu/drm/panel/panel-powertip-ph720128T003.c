@@ -18,15 +18,13 @@
 #include <drm/drm_mipi_dsi.h>
 #include <drm/drm_modes.h>
 #include <drm/drm_panel.h>
+#include <drm/drm_crtc.h>
 
 #include <video/mipi_display.h>
 
 #include <video/of_videomode.h>
 #include <video/videomode.h>
 
-#include <drm/drmP.h>
-#include <drm/drm_crtc.h>
-#include <drm/drm_mipi_dsi.h>
 #include <linux/of.h>
 
 
@@ -333,7 +331,7 @@ static int ph720128t003_unprepare(struct drm_panel *panel)
 		return 0;
 
 	if (ctx->enabled) {
-		DRM_DEV_ERROR(dev, "Panel still enabled!\n");
+		dev_err(dev, "Panel still enabled!\n");
 		return -EPERM;
 	}
 
@@ -352,19 +350,17 @@ static int ph720128t003_enable(struct drm_panel *panel)
 	struct ph720128t003 *ctx = panel_to_ph720128t003(panel);
 	struct mipi_dsi_device *dsi = ctx->dsi;
 	struct device *dev = &dsi->dev;
-	u16 brightness;
-	int ret;
 	u8 buf[2] = {0};
 
 	if (ctx->enabled)
 		return 0;
 
 	if (!ctx->prepared) {
-		DRM_DEV_ERROR(dev, "Panel not prepared!\n");
+		dev_err(dev, "Panel not prepared!\n");
 		return -EPERM;
 	}
 
-	dsi->mode_flags |= MIPI_DSI_MODE_LPM;	//?????
+	dsi->mode_flags |= MIPI_DSI_MODE_LPM;
 
 	ph720128t003_init(dsi);
 
@@ -379,32 +375,12 @@ static int ph720128t003_enable(struct drm_panel *panel)
 	buf[0] = MIPI_DCS_SET_DISPLAY_ON;
 	mipi_dsi_dcs_write_buffer(dsi, buf, 2);
 
-	// /* Exit sleep mode */
-	// ret = mipi_dsi_dcs_exit_sleep_mode(dsi);
-	// if (ret < 0) {
-	// 	DRM_DEV_ERROR(dev, "Failed to exit sleep mode (%d)\n", ret);
-	// 	goto fail;
-	// }
-
-	// usleep_range(5000, 10000);
-
-	// ret = mipi_dsi_dcs_set_display_on(dsi);
-	// if (ret < 0) {
-	// 	DRM_DEV_ERROR(dev, "Failed to set display ON (%d)\n", ret);
-	// 	goto fail;
-	// }
-
 	backlight_enable(ctx->backlight);
 
 	ctx->enabled = true;
 	dsi->mode_flags &= ~MIPI_DSI_MODE_LPM;
 
 	return 0;
-fail:
-	//if (ctx->reset != NULL)
-	//	gpiod_set_value(ctx->reset, 0);
-
-	return ret;
 }
 
 static int ph720128t003_disable(struct drm_panel *panel)
@@ -425,16 +401,14 @@ static int ph720128t003_disable(struct drm_panel *panel)
 
 	ret = mipi_dsi_dcs_set_display_off(dsi);
 	if (ret < 0) {
-		DRM_DEV_ERROR(dev, "Failed to set display OFF (%d)\n", ret);
-		//return ret;
+		dev_err(dev, "Failed to set display OFF (%d)\n", ret);
 	}
 
 	usleep_range(5000, 10000);
 
 	ret = mipi_dsi_dcs_enter_sleep_mode(dsi);
 	if (ret < 0) {
-		DRM_DEV_ERROR(dev, "Failed to enter sleep mode (%d)\n", ret);
-		//return ret;
+		dev_err(dev, "Failed to enter sleep mode (%d)\n", ret);
 	}
 
 	ctx->enabled = false;
@@ -442,20 +416,19 @@ static int ph720128t003_disable(struct drm_panel *panel)
 	return 0;
 }
 
-static int ph720128t003_get_modes(struct drm_panel *panel)
+static int ph720128t003_get_modes(struct drm_panel *panel, struct drm_connector *connector)
 {
 	struct ph720128t003 *ctx = panel_to_ph720128t003(panel);
 	struct device *dev = &ctx->dsi->dev;
-	struct drm_connector *connector = panel->connector;
 	struct drm_display_mode *mode;
 	u32 *bus_flags = &connector->display_info.bus_flags;
 	int ret;
 
-	DRM_DEV_INFO(dev, "get modes\n");
+	dev_info(dev, "get modes\n");
 
 	mode = drm_mode_create(connector->dev);
 	if (!mode) {
-		DRM_DEV_ERROR(dev, "Failed to create display mode!\n");
+		dev_err(dev, "Failed to create display mode!\n");
 		return 0;
 	}
 
@@ -471,18 +444,18 @@ static int ph720128t003_get_modes(struct drm_panel *panel)
 	if (ctx->vm.flags & DISPLAY_FLAGS_DE_LOW)
 		*bus_flags |= DRM_BUS_FLAG_DE_LOW;
 	if (ctx->vm.flags & DISPLAY_FLAGS_PIXDATA_NEGEDGE)
-		*bus_flags |= DRM_BUS_FLAG_PIXDATA_NEGEDGE;
+		*bus_flags |= DRM_BUS_FLAG_PIXDATA_DRIVE_NEGEDGE;
 	if (ctx->vm.flags & DISPLAY_FLAGS_PIXDATA_POSEDGE)
-		*bus_flags |= DRM_BUS_FLAG_PIXDATA_POSEDGE;
+		*bus_flags |= DRM_BUS_FLAG_PIXDATA_DRIVE_POSEDGE;
 
 	ret = drm_display_info_set_bus_formats(&connector->display_info,
 			ph720128t003_bus_formats, ARRAY_SIZE(ph720128t003_bus_formats));
 	if (ret) {
-		DRM_DEV_ERROR(dev, "failed to set display bus format (error:%d)!\n", ret);
+		dev_err(dev, "failed to set display bus format (error:%d)!\n", ret);
 		return ret;
 	}
 
-	drm_mode_probed_add(panel->connector, mode);
+	drm_mode_probed_add(connector, mode);
 
 	return 1;
 }
@@ -520,7 +493,8 @@ static int ph720128t003_dsi_probe(struct mipi_dsi_device *dsi)
 	struct ph720128t003 *ctx;
 	int ret;
 
-	DRM_DEV_INFO(dev, "\n");
+	dev_info(dev, "\n");
+	dev_err(dev, "PROBE POWERTIP DISPLAY\n");
 
 	ctx = devm_kzalloc(&dsi->dev, sizeof(*ctx), GFP_KERNEL);
 	if (!ctx)
@@ -531,7 +505,6 @@ static int ph720128t003_dsi_probe(struct mipi_dsi_device *dsi)
 
 	dsi->format = MIPI_DSI_FMT_RGB888;
 	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_SYNC_PULSE | MIPI_DSI_MODE_LPM;
-//	dsi->mode_flags |= MIPI_DSI_CLOCK_NON_CONTINUOUS | MIPI_DSI_MODE_VIDEO_HSE;
 	dsi->lanes = 2;
 
 	videomode_from_timing(&ph720128t003_default_timing, &ctx->vm);
@@ -555,14 +528,12 @@ static int ph720128t003_dsi_probe(struct mipi_dsi_device *dsi)
 			return -EPROBE_DEFER;
 	}
 
-	drm_panel_init(&ctx->panel);
+	drm_panel_init(&ctx->panel, dev, &ph720128t003_funcs, DRM_MODE_CONNECTOR_DSI);
 	ctx->panel.dev = &dsi->dev;
 	ctx->panel.funcs = &ph720128t003_funcs;
 	dev_set_drvdata(dev, ctx);
 
-	ret = drm_panel_add(&ctx->panel);
-	if (ret < 0)
-		return ret;
+	drm_panel_add(&ctx->panel);
 
 	ret = mipi_dsi_attach(dsi);
 	if (ret < 0)
