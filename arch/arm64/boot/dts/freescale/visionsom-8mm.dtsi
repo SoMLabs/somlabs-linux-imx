@@ -65,9 +65,8 @@
     };
 };
 
-&clk {
-    assigned-clocks = <&clk IMX8MM_AUDIO_PLL1>, <&clk IMX8MM_AUDIO_PLL2>;
-    assigned-clock-rates = <393216000>, <361267200>;
+&{/reserved-memory/linux,cma} {
+        alloc-ranges = <0 0x40000000 0 0x60000000>;
 };
 
 &iomuxc {
@@ -99,10 +98,10 @@
 
     pinctrl_uart1_bt: uart1grp {            /* Bluetooth */
         fsl,pins = <
-            MX8MM_IOMUXC_SAI2_RXFS_UART1_RX         0x140
-            MX8MM_IOMUXC_SAI2_RXC_UART1_TX          0x140
-            MX8MM_IOMUXC_SAI2_RXD0_UART1_CTS_B      0x140
-            MX8MM_IOMUXC_SAI2_TXFS_UART1_RTS_B      0x140
+            MX8MM_IOMUXC_SAI2_RXFS_UART1_DTE_RX     0x140
+            MX8MM_IOMUXC_SAI2_RXC_UART1_DTE_TX      0x140
+            MX8MM_IOMUXC_SAI2_RXD0_UART1_DTE_CTS_B  0x140
+            MX8MM_IOMUXC_SAI2_TXFS_UART1_DTE_RTS_B  0x140
             MX8MM_IOMUXC_SAI2_MCLK_GPIO4_IO27       0x19       /* BT dev wakeup */
             MX8MM_IOMUXC_SAI2_TXC_GPIO4_IO25        0x19       /* BT host wakeup */
             MX8MM_IOMUXC_SAI2_TXD0_GPIO4_IO26       0x19       /* BT Enable */
