@@ -4593,7 +4593,6 @@ static const struct panel_desc_dsi osd101t2045_53ts = {
 
 static const struct drm_display_mode ph128800t004_mode = {
 	.clock = 74250,
-	.vrefresh = 60,
 	.hdisplay = 1280,
 	.hsync_start = 1280 + 80,
 	.hsync_end = 1280 + 8 + 80,
