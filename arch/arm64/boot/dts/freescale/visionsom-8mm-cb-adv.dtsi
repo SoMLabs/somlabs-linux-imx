@@ -185,6 +185,11 @@
         status = "okay";
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_csi>;
+        clocks = <&clk IMX8MM_CLK_CLKO1>;
+        clock-names = "csi_mclk";
+        assigned-clocks = <&clk IMX8MM_CLK_CLKO1>;
+        assigned-clock-parents = <&clk IMX8MM_CLK_24M>;
+        assigned-clock-rates = <24000000>;
         csi_id = <0>;
         pwn-gpios = <&gpio4 9 GPIO_ACTIVE_HIGH>;
         rst-gpios = <&gpio4 8 GPIO_ACTIVE_LOW>;
