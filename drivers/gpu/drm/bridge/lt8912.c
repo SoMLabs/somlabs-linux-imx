@@ -18,7 +18,6 @@
 #include <video/of_display_timing.h>
 #include <video/videomode.h>
 
-#include <drm/drmP.h>
 #include <drm/drm_of.h>
 #include <drm/drm_atomic.h>
 #include <drm/drm_crtc_helper.h>
@@ -390,7 +389,7 @@ static int lt8912_connector_get_modes(struct drm_connector *connector)
 	int i, ret, num_modes = 0;
 
 	if (lt->lvds_mode) {
-		ret = drm_panel_get_modes(lt->lvds_panel);
+		ret = drm_panel_get_modes(lt->lvds_panel, connector);
 	} else {
 
 		/* Check if optional DDC I2C bus should be used. */
@@ -442,7 +441,7 @@ static int lt8912_connector_get_modes(struct drm_connector *connector)
 	}
 
 	connector->display_info.bus_flags = DRM_BUS_FLAG_DE_LOW |
-					    DRM_BUS_FLAG_PIXDATA_NEGEDGE;
+					    DRM_BUS_FLAG_PIXDATA_DRIVE_NEGEDGE;
 	ret = drm_display_info_set_bus_formats(&connector->display_info,
 					       &bus_format, 1);
 
@@ -520,10 +519,9 @@ static void lt8912_bridge_mode_set(struct drm_bridge *bridge,
 	drm_mode_copy(&lt->mode, adj);
 }
 
-static int lt8912_bridge_attach(struct drm_bridge *bridge)
+static int lt8912_bridge_attach(struct drm_bridge *bridge, enum drm_bridge_attach_flags flags)
 {
 	struct lt8912 *lt = bridge_to_lt8912(bridge);
-	struct drm_device *drm = bridge->dev;
 	struct drm_connector *connector = &lt->connector;
 	int ret;
 
@@ -541,14 +539,12 @@ static int lt8912_bridge_attach(struct drm_bridge *bridge)
 	drm_connector_attach_encoder(connector, bridge->encoder);
 
 	if(lt->lvds_mode) {
-		drm_panel_attach(lt->lvds_panel, connector);
+		drm_bridge_attach(bridge->encoder, &lt->bridge, bridge, flags);
 	}
 
 	ret = lt8912_attach_dsi(lt);
 
 	connector->funcs->reset(connector);
-	drm_fb_helper_add_one_connector(drm->fb_helper, connector);
-	drm_connector_register(connector);
 
 	if (!lt->lvds_mode) {
 		enable_irq(lt->irq);
@@ -560,18 +556,11 @@ static int lt8912_bridge_attach(struct drm_bridge *bridge)
 static void lt8912_bridge_detach(struct drm_bridge *bridge)
 {
 	struct lt8912 *lt = bridge_to_lt8912(bridge);
-	struct drm_device *drm = bridge->dev;
 	struct drm_connector *connector = &lt->connector;
 
-	drm_connector_unregister(connector);
-	drm_fb_helper_remove_one_connector(drm->fb_helper, connector);
-	if(lt->lvds_mode) {
-		drm_panel_detach(lt->lvds_panel);
-		lt->lvds_panel = NULL;
-	} else {
+	if(!lt->lvds_mode) {
 		disable_irq(lt->irq);
 	}
-	drm_connector_put(connector);
 }
 
 static const struct drm_bridge_funcs lt8912_bridge_funcs = {
@@ -607,7 +596,7 @@ static int lt8912_i2c_init(struct lt8912 *lt,
 
 	for (i = 0; i < ARRAY_SIZE(info); i++) {
 		if (i > 0 ) {
-			client = i2c_new_dummy(client->adapter, info[i].addr);
+			client = i2c_new_dummy_device(client->adapter, info[i].addr);
 			if (!client)
 				return -ENODEV;
 		}
