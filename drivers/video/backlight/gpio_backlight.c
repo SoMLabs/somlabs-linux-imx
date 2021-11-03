@@ -63,7 +63,7 @@ static int gpio_backlight_probe(struct platform_device *pdev)
 
 	def_value = device_property_read_bool(dev, "default-on");
 
-	if (gbl->def_value) {
+	if (def_value) {
 		gbl->gpiod = devm_gpiod_get(dev, NULL, GPIOD_OUT_HIGH);
 	} else {
 		gbl->gpiod = devm_gpiod_get(dev, NULL, GPIOD_OUT_LOW);
