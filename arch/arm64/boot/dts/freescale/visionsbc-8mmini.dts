@@ -156,9 +156,8 @@
     };
 };
 
-&clk {
-    assigned-clocks = <&clk IMX8MM_AUDIO_PLL1>, <&clk IMX8MM_AUDIO_PLL2>;
-    assigned-clock-rates = <393216000>, <361267200>;
+&{/reserved-memory/linux,cma} {
+    alloc-ranges = <0 0x40000000 0 0x60000000>;
 };
 
 &i2c1 {
@@ -178,23 +177,27 @@
         reg = <0x51>;
     };
 
-	ov5640_mipi: ov5640_mipi@3c {
-		compatible = "ovti,ov5640_mipi";
-		reg = <0x3c>;
-		status = "okay";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_csi>;
-		csi_id = <0>;
-		pwn-gpios = <&gpio2 1 GPIO_ACTIVE_HIGH>;
+    ov5640_mipi: ov5640_mipi@3c {
+        compatible = "ovti,ov5640_mipi";
+        reg = <0x3c>;
+        status = "okay";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_csi>;
+        clocks = <&clk IMX8MM_CLK_CLKO1>;
+        clock-names = "csi_mclk";
+        assigned-clocks = <&clk IMX8MM_CLK_CLKO1>;
+        assigned-clock-parents = <&clk IMX8MM_CLK_24M>;
+        assigned-clock-rates = <24000000>;
+        csi_id = <0>;
+        pwn-gpios = <&gpio2 1 GPIO_ACTIVE_HIGH>;
         rst-gpios = <&gpio2 0 GPIO_ACTIVE_LOW>;
-		mclk = <24000000>;
-		port {
-			ov5640_mipi1_ep: endpoint {
-				remote-endpoint = <&mipi1_sensor_ep>;
-			};
-		};
-	};
-
+        mclk = <24000000>;
+        port {
+            ov5640_mipi1_ep: endpoint {
+                remote-endpoint = <&mipi1_sensor_ep>;
+            };
+        };
+    };
 };
 
 &i2c2 {
@@ -550,6 +553,13 @@
          <&clk IMX8MM_CLK_PCIE1_PHY>,
          <&pcie0_refclk>;
     clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+    assigned-clocks = <&clk IMX8MM_CLK_PCIE1_AUX>,
+                      <&clk IMX8MM_CLK_PCIE1_PHY>,
+                      <&clk IMX8MM_CLK_PCIE1_CTRL>;
+    assigned-clock-rates = <10000000>, <100000000>, <250000000>;
+    assigned-clock-parents = <&clk IMX8MM_SYS_PLL2_50M>,
+                             <&clk IMX8MM_SYS_PLL2_100M>,
+                             <&clk IMX8MM_SYS_PLL2_250M>;
     reserved-region = <&rpmsg_reserved>;
     ext_osc = <0>;
     status = "okay";
