@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright 2020 SomLabs
+ *
+ */
+
+#include "visionsom-8mm-cb-std.dtsi"
+
+/ {
+    model = "SoMLabs VisionSOM i.MX8MM CB-STD";
+};

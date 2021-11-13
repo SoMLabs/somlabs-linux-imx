@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2020-2021 SoMLabs
+ */
+
+#include "visionsom-6ull-nand.dtsi"
+#include "visioncb-6ull-std.dtsi"
+
+/ {
+        model = "SoMLabs VisionCB-6ULL-STD-NAND";
+};

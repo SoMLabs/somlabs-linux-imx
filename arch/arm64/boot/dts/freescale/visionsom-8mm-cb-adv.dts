@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright 2020 SomLabs
+ *
+ */
+
+#include "visionsom-8mm-cb-adv.dtsi"
+
+/ {
+    model = "SoMLabs VisionSOM i.MX8MM CB-ADV";
+};
+
+&iomuxc {
+
+        pinctrl_panel_reset_adv: panel_reset {
+            fsl,pins = <
+                MX8MM_IOMUXC_UART1_RXD_GPIO5_IO22           0x19
+            >;
+        };
+
+};
+
+&mipi_dsi {
+    panel@0 {
+        pinctrl-0 = <&pinctrl_panel_reset_adv>;
+        reset-gpios = <&gpio5 22 GPIO_ACTIVE_LOW>;
+    };
+};
