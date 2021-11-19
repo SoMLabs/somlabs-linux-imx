@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2021 SoMLabs
+ */
+
+#include "starsom-6ull-sd.dtsi"
+#include "starsom-6ull-btwifi.dtsi"
+#include "starsom-cb-6ull.dtsi"
+
+/ {
+        model = "SoMLabs StarSOM-CB-6ULL-SD-BTWIFI";
+};
