@@ -1,0 +1,117 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2021 SoMLabs
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/input/input.h>
+#include "imx6ull.dtsi"
+
+/ {
+        compatible = "somlabs,starsom-6ull", "fsl,imx6ull";
+
+        memory {
+                reg = <0x80000000 0x20000000>;
+        };
+
+        pxp_v4l2 {
+                compatible = "fsl,imx6ul-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
+                status = "okay";
+        };
+
+       regulators {
+                compatible = "simple-bus";
+                #address-cells = <1>;
+                #size-cells = <0>;
+        };
+
+        reserved-memory {
+                #address-cells = <1>;
+                #size-cells = <1>;
+                ranges;
+
+                linux,cma {
+                        compatible = "shared-dma-pool";
+                        reusable;
+                        size = <0x14000000>;
+                        linux,cma-default;
+                };
+        };
+};
+
+&cpu0 {
+        arm-supply = <&reg_arm>;
+        soc-supply = <&reg_soc>;
+};
+
+&clks {
+        assigned-clocks = <&clks IMX6UL_CLK_PLL4_AUDIO_DIV>;
+        assigned-clock-rates = <786432000>;
+};
+
+&gpc {
+        fsl,cpu_pupscr_sw2iso = <0x1>;
+        fsl,cpu_pupscr_sw = <0x0>;
+        fsl,cpu_pdnscr_iso2sw = <0x1>;
+        fsl,cpu_pdnscr_iso = <0x1>;
+        fsl,ldo-bypass = <0>; /* DCDC, ldo-enable */
+};
+
+&iomuxc {
+
+        pinctrl-names = "default";
+        starsom-6ull {
+                pinctrl_wdog: wdoggrp {
+                        fsl,pins = <
+                                MX6UL_PAD_GPIO1_IO09__WDOG1_WDOG_ANY 0x30b0
+                        >;
+                };
+
+                pinctrl_enet1: enet1grp {
+                        fsl,pins = <
+                                MX6UL_PAD_GPIO1_IO07__ENET1_MDC         0x1b0b0
+                                MX6UL_PAD_GPIO1_IO06__ENET1_MDIO        0x1F829
+
+                                MX6UL_PAD_ENET1_RX_EN__ENET1_RX_EN      0x1b0b0
+                                MX6UL_PAD_ENET1_RX_ER__ENET1_RX_ER      0x1b0b0
+                                MX6UL_PAD_ENET1_RX_DATA0__ENET1_RDATA00 0x1b0b0
+                                MX6UL_PAD_ENET1_RX_DATA1__ENET1_RDATA01 0x1b0b0
+                                MX6UL_PAD_ENET1_TX_EN__ENET1_TX_EN      0x1b0b0
+                                MX6UL_PAD_ENET1_TX_DATA0__ENET1_TDATA00 0x1b0b0
+                                MX6UL_PAD_ENET1_TX_DATA1__ENET1_TDATA01 0x1b0b0
+                                MX6UL_PAD_ENET1_TX_CLK__ENET1_REF_CLK1  0x400010a9
+                        >;
+                };
+        };
+};
+
+&pxp {
+        status = "okay";
+};
+
+&wdog1 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_wdog>;
+        fsl,wdog_b;
+};
+
+&fec1 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_enet1>;
+        phy-mode = "rmii";
+        phy-handle = <&ethphy0>;
+        status = "okay";
+
+        mdio {
+                #address-cells = <1>;
+                #size-cells = <0>;
+
+                ethphy0: ethernet-phy@1 {
+                        compatible = "ethernet-phy-ieee802.3-c22";
+                        reg = <1>;
+                        clocks = <&clks IMX6UL_CLK_ENET_REF>;
+                        clock-names = "rmii-ref";
+                };
+        };
+};

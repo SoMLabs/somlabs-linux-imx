@@ -701,6 +701,10 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ulz-14x14-evk-btwifi-sdio3_0.dtb \
 	imx6ulz-14x14-evk-gpmi-weim.dtb \
 	imx6ulz-14x14-evk-emmc.dtb \
+	starsom-cb-6ull-emmc.dtb \
+	starsom-cb-6ull-emmc-btwifi.dtb \
+	starsom-cb-6ull-sd.dtb \
+	starsom-cb-6ull-sd-btwifi.dtb \
 	visioncb-6ull-std-emmc.dtb \
 	visioncb-6ull-std-emmc-btwifi.dtb \
 	visioncb-6ull-std-nand.dtb \
