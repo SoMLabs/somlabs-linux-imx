@@ -92,7 +92,7 @@
         clock_frequency = <100000>;
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_i2c2>;
-        status = "disabled";
+        status = "okay";
 
         polytouch: edt-ft5406@38 {
                         status = "okay";
@@ -274,7 +274,7 @@
 &uart1 {
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_uart1>;
-        status = "disabled";
+        status = "okay";
 };
 
 &uart4 {
@@ -286,7 +286,7 @@
 &uart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
-	status = "disabled";
+	status = "okay";
 };
 
 &usbotg1 {
@@ -294,14 +294,14 @@
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_usb_otg1_id>;
         dr_mode = "otg";
-        status = "disabled";
+        status = "okay";
 };
 
 &usbotg2 {
         vbus-supply = <&reg_usb_otg2_vbus>;
         pinctrl-names = "default";
         dr_mode = "host";
-        status = "disabled";
+        status = "okay";
 };
 
 &usbphy1 {
