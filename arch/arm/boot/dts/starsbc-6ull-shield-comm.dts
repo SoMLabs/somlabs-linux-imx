@@ -1,0 +1,64 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright (C) 2021 SoMLabs
+ */
+
+#include "starsbc-6ull.dts"
+
+/ {
+	model = "SoMLabs StarSBC-6ULL (COMM shield)";
+};
+
+&iomuxc {
+
+	starsbc-6ull-comm {
+		/* pinmux settings for COMM shield */
+
+		pinctrl_uart4_rts_gpio: uart4grp-rts-gpio {
+			fsl,pins = <
+				MX6UL_PAD_LCD_DATA20__GPIO3_IO25		0x1b0b1
+			>;
+		};
+
+		pinctrl_uart8_rts_gpio: uart8grp-rtsgpio {
+			fsl,pins = <
+				MX6UL_PAD_LCD_DATA21__GPIO3_IO26		0x1b0b1
+			>;
+		};
+
+	};
+};
+
+&uart4 {	/* RS485 */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart4 &pinctrl_uart4_rts_gpio>;
+	/delete-property/ uart-has-rtscts;
+	rts-gpios = <&gpio3 25 GPIO_ACTIVE_HIGH>;
+	linux,rs485-enabled-at-boot-time;
+	status = "okay";
+};
+
+&uart8 {	/* RS485 */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart8 &pinctrl_uart8_rts_gpio>;
+	/delete-property/ uart-has-rtscts;
+	rts-gpios = <&gpio3 26 GPIO_ACTIVE_HIGH>;
+	linux,rs485-enabled-at-boot-time;
+	status = "okay";
+};
+
+&uart3 {	/* RS232 */
+	status = "okay";
+};
+
+&uart7 {	/* RS232 */
+	status = "okay";
+};
+
+&can1 {
+	status = "okay";
+};
+
+&can2 {
+	status = "okay";
+};
