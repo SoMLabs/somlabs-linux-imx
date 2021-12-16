@@ -809,11 +809,6 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ulz-14x14-evk-btwifi.dtb \
 	imx6ulz-14x14-evk-emmc.dtb \
 	imx6ulz-14x14-evk-gpmi-weim.dtb \
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> SOMLABS: add support for StarSOM-6ULL modules.
 	imx6ulz-bsh-smm-m2.dtb
 
 imx6ul-14x14-evk-reve-dtbs := imx6ul-14x14-evk.dtb imx6ul-14x14-evk-reve.dtbo
@@ -847,6 +842,8 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ulz-14x14-evk-reve-btwifi.dtb \
 	imx6ulz-14x14-evk-reve-emmc.dtb \
 	imx6ulz-14x14-evk-reve-gpmi-weim.dtb \
+	starsbc-6ull.dtb \
+	starsbc-6ull-shield-comm.dtb \
 	starsom-cb-6ull-emmc.dtb \
 	starsom-cb-6ull-emmc-btwifi.dtb \
 	starsom-cb-6ull-sd.dtb \
