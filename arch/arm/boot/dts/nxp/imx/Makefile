@@ -409,6 +409,8 @@ dtb-$(CONFIG_SOC_IMX6UL) += \
 	imx6ulz-14x14-evk-emmc.dtb \
 	imx6ulz-14x14-evk-gpmi-weim.dtb \
 	imx6ulz-bsh-smm-m2.dtb \
+	starsbc-6ull.dtb \
+	starsbc-6ull-shield-comm.dtb \
 	starsom-cb-6ull-emmc.dtb \
 	starsom-cb-6ull-emmc-btwifi.dtb \
 	starsom-cb-6ull-sd.dtb \
