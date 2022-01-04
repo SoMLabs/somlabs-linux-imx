@@ -91,7 +91,7 @@
 		compatible = "mmc-pwrseq-simple";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_wlan_en>;
-		reset-gpios = <&gpio1 8 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&gpio3 18 GPIO_ACTIVE_LOW>;
 	};
 
 };
