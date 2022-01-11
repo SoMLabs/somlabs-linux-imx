@@ -40,7 +40,7 @@ struct fsl_mqs {
 	bool use_gpr;
 };
 
-#define FSL_MQS_RATES	(SNDRV_PCM_RATE_44100 | SNDRV_PCM_RATE_48000)
+#define FSL_MQS_RATES	(SNDRV_PCM_RATE_48000)
 #define FSL_MQS_FORMATS	SNDRV_PCM_FMTBIT_S16_LE
 
 static int fsl_mqs_hw_params(struct snd_pcm_substream *substream,
