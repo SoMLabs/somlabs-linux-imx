@@ -7,6 +7,56 @@
 
 / {
 	model = "SoMLabs StarSBC-6ULL (COMM shield)";
+
+	mqs: mqs {
+		#sound-dai-cells = <0>;
+		compatible = "fsl,imx6sx-mqs";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mqs>;
+		clocks = <&clks IMX6UL_CLK_SAI1>;
+		clock-names = "mclk";
+		gpr = <&gpr>;
+		status = "okay";
+	};
+
+	sound {
+		status = "disabled";
+	};
+
+	sound-mqs {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "simple-mqs-audio";
+
+		simple-audio-card,dai-link@0 {
+			format = "left_j";
+			bitclock-master = <&sndcpu>;
+			frame-master = <&sndcpu>;
+
+			sndcpu: cpu {
+				sound-dai = <&sai1 0>;
+			};
+			codec {
+				sound-dai = <&mqs 0>;
+			};
+		};
+	};
+};
+
+&clks {
+	assigned-clocks = <&clks IMX6UL_CLK_PLL4_AUDIO_DIV>;
+	assigned-clock-rates = <786432000>;
+};
+
+&sai1 {
+	assigned-clocks = <&clks IMX6UL_CLK_SAI1_SEL>, <&clks IMX6UL_CLK_SAI1>;
+	assigned-clock-parents = <&clks IMX6UL_CLK_PLL4_AUDIO_DIV>;
+	assigned-clock-rates = <0>, <24576000>;
+	status = "okay";
+};
+
+&sdma {
+	gpr = <&gpr>;
+	fsl,sdma-event-remap = <0 15 1>, <0 16 1>;
 };
 
 &iomuxc {

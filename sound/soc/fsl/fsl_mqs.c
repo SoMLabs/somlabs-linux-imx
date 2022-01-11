@@ -72,7 +72,7 @@ struct fsl_mqs {
 	unsigned int reg_mqs_ctrl;
 };
 
-#define FSL_MQS_RATES	(SNDRV_PCM_RATE_44100 | SNDRV_PCM_RATE_48000)
+#define FSL_MQS_RATES	(SNDRV_PCM_RATE_48000)
 #define FSL_MQS_FORMATS	SNDRV_PCM_FMTBIT_S16_LE
 
 static int fsl_mqs_sm_read(void *context, unsigned int reg, unsigned int *val)
