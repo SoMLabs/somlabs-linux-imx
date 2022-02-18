@@ -1381,7 +1381,17 @@ static void sec_mipi_dsim_bridge_atomic_enable(struct drm_bridge *bridge,
 	/* config esc clock, byte clock and etc */
 	sec_mipi_dsim_config_clkctrl(dsim);
 
-	drm_panel_enable(dsim->panel);
+	/* make sure the interrupts are enabled before enabling the display */
+	sec_mipi_dsim_irq_init(dsim);
+
+	/* enable panel if exists */
+	if (dsim->panel) {
+		ret = drm_panel_enable(dsim->panel);
+		if (unlikely(ret)) {
+			dev_err(dsim->dev, "panel enable failed: %d\n", ret);
+			goto panel_unprepare;
+		}
+	}
 
 	/* enable data transfer of dsim */
 	sec_mipi_dsim_set_standby(dsim, true);
