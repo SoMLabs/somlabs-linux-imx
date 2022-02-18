@@ -1335,6 +1335,9 @@ static void sec_mipi_dsim_bridge_enable(struct drm_bridge *bridge)
 	/* config esc clock, byte clock and etc */
 	sec_mipi_dsim_config_clkctrl(dsim);
 
+	/* make sure the interrupts are enabled before enabling the display */
+	sec_mipi_dsim_irq_init(dsim);
+
 	/* enable panel if exists */
 	if (dsim->panel) {
 		ret = drm_panel_enable(dsim->panel);
