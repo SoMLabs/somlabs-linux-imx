@@ -213,15 +213,6 @@
         >;
     };
 
-    pinctrl_ecspi1: ecspi1grp {
-        fsl,pins = <
-            MX8MM_IOMUXC_ECSPI1_SS0_GPIO5_IO9			0x19
-            MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO		0x19
-            MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI		0x19
-            MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK		0x19
-        >;
-    };
-
     pinctrl_uart3: uart3grp {
         fsl,pins = <
             MX8MM_IOMUXC_UART3_RXD_UART3_DCE_RX     0x140
@@ -275,22 +266,6 @@
             compatible = "ethernet-phy-ieee802.3-c22";
             reg = <0>;
         };
-    };
-};
-
-&ecspi1 {
-    pinctrl-names = "default";
-    pinctrl-0 = <&pinctrl_ecspi1>;
-    fsl,spi-num-chipselects = <1>;
-    cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
-    status = "okay";
-    #address-cells = <1>;
-    #size-cells = <0>;
-
-    spidev@0 {
-        compatible = "spidev";
-        spi-max-frequency = <2000000>;
-        reg = <0>;
     };
 };
 

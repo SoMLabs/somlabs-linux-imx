@@ -33,11 +33,13 @@
         simple-audio-card,bitclock-master = <&dailink_master>;
         simple-audio-card,frame-master = <&dailink_master>;
 
-        simple-audio-card,cpu {
+        dailink_master: simple-audio-card,cpu {
             sound-dai = <&sai3>;
+            dai-tdm-slot-num = <2>;
+            dai-tdm-slot-width = <32>;
         };
 
-        dailink_master: simple-audio-card,codec {
+        simple-audio-card,codec {
             sound-dai = <&codec_nau8822>;
             clocks = <&clk IMX8MM_CLK_SAI3_ROOT>;
         };
@@ -146,14 +148,9 @@
 &sai3 {
     pinctrl-names = "default";
     pinctrl-0 = <&pinctrl_sai3>;
-    clocks = <&clk IMX8MM_CLK_SAI3_IPG>, <&clk IMX8MM_CLK_DUMMY>,
-        <&clk IMX8MM_CLK_SAI1_ROOT>, <&clk IMX8MM_CLK_DUMMY>,
-        <&clk IMX8MM_CLK_DUMMY>, <&clk IMX8MM_AUDIO_PLL1_OUT>,
-        <&clk IMX8MM_AUDIO_PLL2_OUT>;
-    clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3", "pll8k", "pll11k";
     assigned-clocks = <&clk IMX8MM_CLK_SAI3>;
     assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
-    assigned-clock-rates = <12288000>;
+    assigned-clock-rates = <24576000>;
     status = "okay";
 };
 
@@ -245,7 +242,6 @@
     assigned-clock-parents = <&clk IMX8MM_SYS_PLL2_50M>,
                              <&clk IMX8MM_SYS_PLL2_100M>,
                              <&clk IMX8MM_SYS_PLL2_250M>;
-    reserved-region = <&rpmsg_reserved>;
     ext_osc = <0>;
     status = "okay";
 };

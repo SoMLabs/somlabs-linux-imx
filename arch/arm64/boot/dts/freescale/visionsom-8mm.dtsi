@@ -13,11 +13,9 @@
         android {
             compatible = "android,firmware";
             /* default emmc node used for GSI */
-            boot_devices = "soc@0/soc@0:bus@30800000/30b60000.mmc";
-            /* sd card node which used if androidboot.boot_device_root=mmcblk1 */
-            boot_devices_mmcblk1 = "soc@0/soc@0:bus@30800000/30b50000.mmc";
+            boot_devices = "soc@0/30800000.bus/30b60000.mmc";
             /* emmc node which used if androidboot.boot_device_root=mmcblk2 */
-            boot_devices_mmcblk2 = "soc@0/soc@0:bus@30800000/30b60000.mmc";
+            boot_devices_mmcblk2 = "soc@0/30800000.bus/30b60000.mmc";
             fstab {
                 compatible = "android,fstab";
                 system {
@@ -25,7 +23,14 @@
                     dev = "system";
                     type = "ext4";
                     mnt_flags = "noatime,errors=panic,ro,barrier=1,inode_readahead_blks=8";
-                    fsmgr_flags = "wait,slotselect,avb,avb_keys=/avb/q-gsi.avbpubkey:/avb/r-gsi.avbpubkey:/avb/s-gsi.avbpubkey,logical,first_stage_mount";
+                    fsmgr_flags = "wait,slotselect,avb,avb_keys=/avb,logical,first_stage_mount";
+                };
+                system_ext {
+                    compatible = "android,system_ext";
+                    dev = "system_ext";
+                    type = "ext4";
+                    mnt_flags = "noatime,ro,errors=panic";
+                    fsmgr_flags = "wait,slotselect,avb,logical,first_stage_mount";
                 };
                 vendor {
                     compatible = "android,vendor";
@@ -41,6 +46,13 @@
                     mnt_flags = "noatime,errors=panic,ro,barrier=1,inode_readahead_blks=8";
                     fsmgr_flags = "wait,slotselect,avb,logical,first_stage_mount";
                 };
+                metadata {
+                    compatible = "android,metadata";
+                    dev = "/dev/block/by-name/metadata";
+                    type = "ext4";
+                    mnt_flags = "noatime,nosuid,nodev,discard,sync";
+                    fsmgr_flags = "wait,formattable,first_stage_mount,check";
+                };
             };
             vbmeta {
                 /*we need use FirstStageMountVBootV2 if we enable avb*/
@@ -53,45 +65,8 @@
 };
 
 / {
-    trusty {
-        compatible = "android,trusty-smc-v1";
-        ranges;
-        #address-cells = <2>;
-        #size-cells = <2>;
-        trusty-irq {
-            compatible = "android,trusty-irq-v1";
-            interrupt-templates = <&trusty_ipi 0>;
-            interrupt-ranges = < 0 15 0>;
-        };
-        trusty-virtio {
-            compatible = "android,trusty-virtio-v1";
-        };
-        trusty-log {
-            compatible = "android,trusty-log-v1";
-        };
-    };
-    trusty_ipi: interrupt-controller@0 {
-        compatible = "android,CustomIPI";
-        interrupt-controller;
-        #interrupt-cells = <1>;
-    };
-};
-
-
-/ {
     model = "SoMLabs VisionSOM i.MX8MM";
     compatible = "somlabs,visionsom-imx8mm", "fsl,imx8mm";
-
-    reserved-memory {
-        #address-cells = <2>;
-        #size-cells = <2>;
-        ranges;
-
-        rpmsg_reserved: rpmsg@0xb8000000 {
-            no-map;
-            reg = <0 0xb8000000 0 0x400000>;
-        };
-    };
 
     chosen {
         bootargs = "console=ttymxc3,115200 earlycon=ec_imx6q,0x30a60000,115200";
@@ -141,10 +116,6 @@
         };
 
     };
-};
-
-&{/reserved-memory/linux,cma} {
-    alloc-ranges = <0 0x40000000 0 0x60000000>;
 };
 
 &ddrc {
@@ -541,3 +512,8 @@
 &vpu_h1 {
     status = "okay";
 };
+
+&vpu_v4l2 {
+        status = "okay";
+};
+

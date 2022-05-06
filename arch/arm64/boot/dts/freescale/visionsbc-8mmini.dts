@@ -21,6 +21,14 @@
             no-map;
             reg = <0 0xb8000000 0 0x400000>;
         };
+
+        linux,cma {
+            compatible = "shared-dma-pool";
+            reusable;
+            size = <0 0x28000000>;
+            alloc-ranges = <0 0x40000000 0 0x60000000>;
+            linux,cma-default;
+        };
     };
 
     chosen {
@@ -154,10 +162,6 @@
             clock-frequency = <100000000>;
         };
     };
-};
-
-&{/reserved-memory/linux,cma} {
-    alloc-ranges = <0 0x40000000 0 0x60000000>;
 };
 
 &i2c1 {
