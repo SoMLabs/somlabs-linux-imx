@@ -123,6 +123,8 @@ static void lt8912_audio_config(struct lt8912 *lt)
 {
 	regmap_write(lt->regmap[0], 0xb2, lt->sink_is_hdmi);	// 0x01:HDMI; 0x00: DVI
 
+	lt->audio_mode = LT8912_AUDIO_SPDIF;
+
 	switch(lt->audio_mode) {
 		case LT8912_AUDIO_NONE:
 			regmap_write(lt->regmap[2], 0x06, 0x00);
