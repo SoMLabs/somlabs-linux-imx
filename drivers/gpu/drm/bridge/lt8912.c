@@ -740,6 +740,9 @@ static int lt8912_probe(struct i2c_client *i2c, const struct i2c_device_id *id)
 
 	lt->swap_mipi_pn = of_property_read_bool(dev->of_node, "swap-mipi-pn");
 
+	if (of_property_read_bool(dev->of_node, "audio-spdif"))
+		lt->audio_mode = LT8912_AUDIO_SPDIF;
+
 	ret = lt8912_i2c_init(lt, i2c);
 	if (ret)
 		return ret;
