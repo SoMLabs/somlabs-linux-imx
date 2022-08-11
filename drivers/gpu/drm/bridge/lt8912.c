@@ -519,13 +519,79 @@ static void lt8912_bridge_mode_set(struct drm_bridge *bridge,
 	drm_mode_copy(&lt->mode, adj);
 }
 
+static int lt8912_get_hpd_gpio(struct device *dev, struct lt8912 *lt)
+{
+        unsigned int irq_flags;
+        int ret;
+
+        lt->hpd_gpio = devm_gpiod_get(dev, "hpd", GPIOD_IN);
+        if (IS_ERR(lt->hpd_gpio)) {
+                ret = PTR_ERR(lt->hpd_gpio);
+                dev_err(dev, "failed to get hpd gpio\n");
+                return ret;
+        }
+
+        lt->irq = gpiod_to_irq(lt->hpd_gpio);
+        if (lt->irq == -ENXIO) {
+                dev_err(dev, "failed to get hpd irq\n");
+                return -ENODEV;
+        }
+        if (lt->irq < 0) {
+                dev_err(dev, "failed to get hpd irq, %i\n", lt->irq);
+                return lt->irq;
+        }
+        irq_flags = IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT;
+        ret = devm_request_threaded_irq(dev, lt->irq,
+                                        NULL,
+                                        lt8912_hpd_irq_thread,
+                                        irq_flags, "lt8912_hpd", lt);
+        if (ret) {
+                dev_err(dev, "failed to request irq\n");
+                return -ENODEV;
+        }
+
+        disable_irq(lt->irq);
+
+        return ret;
+}
+
 static int lt8912_bridge_attach(struct drm_bridge *bridge, enum drm_bridge_attach_flags flags)
 {
 	struct lt8912 *lt = bridge_to_lt8912(bridge);
 	struct drm_connector *connector = &lt->connector;
 	int ret;
+	int type;
 
-	int type = lt->lvds_mode?DRM_MODE_CONNECTOR_LVDS:DRM_MODE_CONNECTOR_HDMIA;
+        lt->num_dsi_lanes = 4;
+        lt->channel_id = 1;
+
+        // get lvds panel
+        drm_of_find_panel_or_bridge(lt->dev->of_node, 2, 0, &lt->lvds_panel, NULL);
+
+        // get hdmi_connector node
+        lt->hdmi_connector = of_graph_get_remote_node(lt->dev->of_node, 1, 0);
+        if (lt->hdmi_connector) {
+                of_node_put(lt->hdmi_connector);
+        }
+
+        if(lt->hdmi_connector && lt->lvds_panel) {
+                dev_err(lt->dev, "do not specify both LVDS panel and HDMI connector! Only one output is supported!\n");
+                return -EINVAL;
+        }
+
+        // if no panel or connector can be found, try again later after drm gets fully initialized
+        if(!lt->hdmi_connector && !lt->lvds_panel)
+                return -EPROBE_DEFER;
+
+        // if in hdmi mode, get hpd pin and audio remote node
+        if(lt->hdmi_connector){
+                lt8912_get_hpd_gpio(lt->dev, lt);
+                lt->audio_host = of_graph_get_remote_node(lt->dev->of_node, 3, 0);
+        } else {
+                lt->lvds_mode = true;
+        }
+
+	type = lt->lvds_mode?DRM_MODE_CONNECTOR_LVDS:DRM_MODE_CONNECTOR_HDMIA;
 
 	connector->polled = DRM_CONNECTOR_POLL_HPD;
 	ret = drm_connector_init(bridge->dev, connector,
@@ -665,43 +731,6 @@ void lt8912_detach_dsi(struct lt8912 *lt)
 	mipi_dsi_device_unregister(lt->dsi);
 }
 
-static int lt8912_get_hpd_gpio(struct device *dev, struct lt8912 *lt)
-{
-	unsigned int irq_flags;
-	int ret;
-
-	lt->hpd_gpio = devm_gpiod_get(dev, "hpd", GPIOD_IN);
-	if (IS_ERR(lt->hpd_gpio)) {
-		ret = PTR_ERR(lt->hpd_gpio);
-		dev_err(dev, "failed to get hpd gpio\n");
-		return ret;
-	}
-
-	lt->irq = gpiod_to_irq(lt->hpd_gpio);
-	if (lt->irq == -ENXIO) {
-		dev_err(dev, "failed to get hpd irq\n");
-		return -ENODEV;
-	}
-	if (lt->irq < 0) {
-		dev_err(dev, "failed to get hpd irq, %i\n", lt->irq);
-		return lt->irq;
-	}
-	irq_flags = IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING | IRQF_ONESHOT;
-	ret = devm_request_threaded_irq(dev, lt->irq,
-					NULL,
-					lt8912_hpd_irq_thread,
-					irq_flags, "lt8912_hpd", lt);
-	if (ret) {
-		dev_err(dev, "failed to request irq\n");
-		return -ENODEV;
-	}
-
-	disable_irq(lt->irq);
-
-	return ret;
-}
-
-
 static int lt8912_probe(struct i2c_client *i2c, const struct i2c_device_id *id)
 {
 	struct device *dev = &i2c->dev;
@@ -709,13 +738,6 @@ static int lt8912_probe(struct i2c_client *i2c, const struct i2c_device_id *id)
 	struct device_node *ddc_phandle;
 	int ret;
 
-	static int initialize_it = 1;
-
-	if(!initialize_it) {
-		initialize_it = 1;
-		return -EPROBE_DEFER;
-	}
-	dev_info(dev, "probe enter\n");
 	lt = devm_kzalloc(dev, sizeof(*lt), GFP_KERNEL);
 	if (!lt)
 		return -ENOMEM;
@@ -749,9 +771,6 @@ static int lt8912_probe(struct i2c_client *i2c, const struct i2c_device_id *id)
 
 	/* TODO: interrupt handing */
 
-	lt->num_dsi_lanes = 4;
-	lt->channel_id = 1;
-
 	// get mipi host node
 	lt->mipi_host = of_graph_get_remote_node(dev->of_node, 0, 0);
 	if (!lt->mipi_host) {
@@ -759,39 +778,10 @@ static int lt8912_probe(struct i2c_client *i2c, const struct i2c_device_id *id)
 	}
 	of_node_put(lt->mipi_host);
 
-	// get lvds panel
-	drm_of_find_panel_or_bridge(dev->of_node, 2, 0, &lt->lvds_panel, NULL);
-
-	// get hdmi_connector node
-	lt->hdmi_connector = of_graph_get_remote_node(dev->of_node, 1, 0);
-	if (lt->hdmi_connector) {
-		of_node_put(lt->hdmi_connector);
-	}
-
-	if(lt->hdmi_connector && lt->lvds_panel) {
-		dev_err(dev, "do not specify both LVDS panel and HDMI connector! Only one output is supported!\n");
-		return -EINVAL;
-	}
-
-	if(!lt->hdmi_connector && !lt->lvds_panel) {
-		dev_err(dev, "Please specify either LVDS panel or HDMI connector!\n");
-		return -ENODEV;
-	}
-
-	// if in hdmi mode, get hpd pin and audio remote node
-	if(lt->hdmi_connector){
-		lt8912_get_hpd_gpio(dev, lt);
-		lt->audio_host = of_graph_get_remote_node(dev->of_node, 3, 0);
-	} else {
-		lt->lvds_mode = true;
-	}
-
 	lt->bridge.funcs = &lt8912_bridge_funcs;
 	lt->bridge.of_node = dev->of_node;
 
 	drm_bridge_add(&lt->bridge);
-
-	dev_info(dev, "probe exit success\n");
 
 	return 0;
 }
