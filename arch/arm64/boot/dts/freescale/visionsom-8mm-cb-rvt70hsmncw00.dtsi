@@ -1,0 +1,36 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright 2020 SomLabs
+ *
+ */
+
+#include <dt-bindings/pwm/pwm.h>
+
+&panel_backlight {
+    pwms = <&pwm2 0 25000 PWM_POLARITY_INVERTED>;
+};
+
+&i2c2 {
+
+    ili2132a_touch: ili2132a@41 {
+        compatible = "ilitek,ili2132";
+        reg = <0x41>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_touch>;
+        interrupt-parent = <&gpio5>;
+        interrupts = <23 IRQ_TYPE_EDGE_FALLING>;
+        reset-gpios = <&gpio5 3 GPIO_ACTIVE_LOW>;
+    };
+};
+
+&mipi_dsi {
+    status = "okay";
+
+    panel@0 {
+        pinctrl-names = "default";
+        compatible = "riverdi,rvt70hsmncw00";
+        reg = <0>;
+        backlight = <&panel_backlight>;
+        status = "okay";
+    };
+};
