@@ -881,4 +881,13 @@ config DRM_PANEL_POWERTIP_PH720128T003
 	help
 	  Say Y here if you want to enable support for Powertip PH720128T003 HD
 	  (720x1280) DSI panel.
+
+config DRM_PANEL_RIVERDI_RVT70HSMNWC00
+        tristate "Riverdi RVT70HSMNWC00 panel"
+        depends on OF
+        depends on DRM_MIPI_DSI
+        depends on BACKLIGHT_CLASS_DEVICE
+        help
+          Say Y here if you want to enable support for Riverdi RVT70HSMNWC00
+          (1024x600) DSI panel.
 endmenu
