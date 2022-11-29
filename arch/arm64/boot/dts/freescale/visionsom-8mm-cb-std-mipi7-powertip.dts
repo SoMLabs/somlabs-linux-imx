@@ -8,5 +8,5 @@
 #include "visionsom-8mm-cb-ph720128t003.dtsi"
 
 / {
-    model = "SoMLabs VisionSOM i.MX8MM CB-STD/MIPI7";
+    model = "SoMLabs VisionSOM i.MX8MM CB-STD/MIPI7-POWERTIP";
 };
