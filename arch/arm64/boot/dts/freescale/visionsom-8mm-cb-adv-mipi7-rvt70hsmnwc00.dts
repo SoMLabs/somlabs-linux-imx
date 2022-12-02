@@ -5,8 +5,8 @@
  */
 
 #include "visionsom-8mm-cb-adv-mipi.dtsi"
-#include "visionsom-8mm-cb-rvt70hsmncw00.dtsi"
+#include "visionsom-8mm-cb-rvt70hsmnwc00.dtsi"
 
 / {
-    model = "SoMLabs VisionSOM i.MX8MM CB-ADV/MIPI7-RIVERDI";
+    model = "SoMLabs VisionSOM i.MX8MM CB-ADV/MIPI7-RVT70HSMNWC00";
 };
