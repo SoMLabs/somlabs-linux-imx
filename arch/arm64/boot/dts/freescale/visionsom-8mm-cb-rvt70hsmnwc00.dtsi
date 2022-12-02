@@ -28,7 +28,7 @@
 
     panel@0 {
         pinctrl-names = "default";
-        compatible = "riverdi,rvt70hsmncw00";
+        compatible = "riverdi,rvt70hsmnwc00";
         reg = <0>;
         backlight = <&panel_backlight>;
         status = "okay";
