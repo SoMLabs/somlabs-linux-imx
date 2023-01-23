@@ -55,7 +55,7 @@
 
 &{/reserved-memory/linux,cma} {
         alloc-ranges = <0 0x40000000 0 0x60000000>;
-        size = <0 0x10000000>;
+        size = <0 0x28000000>;
 };
 
 &A53_0 {
