@@ -3,6 +3,8 @@
  * Copyright (C) 2020-2021 SoMLabs
  */
 
+#include "visioncb-6ull-lcd-rvt70hstfwca0.dtsi"
+
 / {
         backlight_0: backlight {
                 compatible = "gpio-backlight";
@@ -117,25 +119,10 @@
 };
 
 &i2c2 {
-        clock_frequency = <100000>;
+        clock-frequency = <400000>;
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_i2c2>;
         status = "okay";
-
-        polytouch: edt-ft5406@38 {
-                        status = "okay";
-                        compatible = "edt,edt-ft5406", "edt,edt-ft5x06";
-                        pinctrl-names = "default";
-                        pinctrl-0 = <&pinctrl_edt_ft5406_ts>;
-
-                        reg = <0x38>;
-                        interrupt-parent = <&gpio1>;
-                        interrupts = <2 IRQ_TYPE_EDGE_FALLING>;
-                        touchscreen-size-x = <800>;
-                        touchscreen-size-y = <480>;
-                        touchscreen-inverted-x;
-                        touchscreen-inverted-y;
-        };
 };
 
 &iomuxc {
@@ -156,7 +143,7 @@
                         >;
                 };
 
-                pinctrl_edt_ft5406_ts: edtft5406tsgrp {
+                pinctrl_touch: touchgrp {
                         fsl,pins = <
                                 MX6UL_PAD_GPIO1_IO02__GPIO1_IO02        0x1b0b0
                         >;
@@ -281,31 +268,6 @@
         display = <&display0>;
         backlight = <&backlight_0>;
         status = "okay";
-
-        display0: display {
-                bits-per-pixel = <16>;
-                bus-width = <24>;
-
-                display-timings {
-                        native-mode = <&timing0>;
-                        timing0: timing0 {
-                                clock-frequency = <33300000>;
-                                hactive = <800>;
-                                vactive = <480>;
-                                hfront-porch = <210>;
-                                hback-porch = <46>;
-                                hsync-len = <20>;
-                                vback-porch = <23>;
-                                vfront-porch = <22>;
-                                vsync-len = <10>;
-
-                                hsync-active = <0>;
-                                vsync-active = <0>;
-                                de-active = <1>;
-                                pixelclk-active = <0>;
-                        };
-                };
-        };
 };
 
 &uart1 {
