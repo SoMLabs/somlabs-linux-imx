@@ -41,6 +41,9 @@
 #define REPORT_COUNT_ADDRESS				61
 #define ILITEK_SUPPORT_MAX_POINT			40
 
+#define REPORT_ID_ADDRESS				0
+#define REPORT_ID_VALUE 				0x48
+
 struct ilitek_protocol_info {
 	u16 ver;
 	u8 ver_major;
@@ -168,6 +171,10 @@ static int ilitek_process_and_report_v6(struct ilitek_ts_data *ts)
 		dev_err(dev, "get touch info failed. Wrong id: 0x%02X\n", buf[0]);
 		return -EINVAL;
 	}
+
+	// Do not process the event if there is no correct report ID.
+	if (buf[REPORT_ID_ADDRESS] != REPORT_ID_VALUE)
+		return 0;
 
 	report_max_point = buf[REPORT_COUNT_ADDRESS];
 	if (report_max_point > ts->max_tp) {
