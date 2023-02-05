@@ -386,8 +386,8 @@
 
         pinctrl_eqos: eqosgrp {
                 fsl,pins = <
-                        //MX8MP_IOMUXC_ENET_MDC__ENET_QOS_MDC                             0x3
-                        //MX8MP_IOMUXC_ENET_MDIO__ENET_QOS_MDIO                           0x3
+                        MX8MP_IOMUXC_ENET_MDC__ENET_QOS_MDC                             0x3
+                        MX8MP_IOMUXC_ENET_MDIO__ENET_QOS_MDIO                           0x3
                         MX8MP_IOMUXC_ENET_RD0__ENET_QOS_RGMII_RD0                       0x91
                         MX8MP_IOMUXC_ENET_RD1__ENET_QOS_RGMII_RD1                       0x91
                         MX8MP_IOMUXC_ENET_RD2__ENET_QOS_RGMII_RD2                       0x91
@@ -400,15 +400,8 @@
                         MX8MP_IOMUXC_ENET_TD3__ENET_QOS_RGMII_TD3                       0x1f
                         MX8MP_IOMUXC_ENET_TX_CTL__ENET_QOS_RGMII_TX_CTL                 0x1f
                         MX8MP_IOMUXC_ENET_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK       0x1f
-                        MX8MP_IOMUXC_NAND_READY_B__GPIO3_IO16                           0x39    /* phy reset */
+                        MX8MP_IOMUXC_NAND_READY_B__GPIO3_IO16                           0x19    /* phy reset */
                         MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20                              0x41    /* phy int */
-                >;
-        };
-
-        pinctrl_eqos_mdio_gpio: eqosgrp_mdio {
-                fsl,pins = <
-                        MX8MP_IOMUXC_ENET_MDC__GPIO1_IO16                               0x6
-                        MX8MP_IOMUXC_ENET_MDIO__GPIO1_IO17                              0x1f6
                 >;
         };
 
@@ -428,7 +421,7 @@
                         MX8MP_IOMUXC_SAI1_TXD3__ENET1_RGMII_TD3         0x1f
                         MX8MP_IOMUXC_SAI1_TXD4__ENET1_RGMII_TX_CTL      0x1f
                         MX8MP_IOMUXC_SAI1_TXD5__ENET1_RGMII_TXC         0x1f
-                        MX8MP_IOMUXC_SAI1_TXD6__GPIO4_IO18              0x39    /* phy reset */
+                        MX8MP_IOMUXC_SAI1_TXD6__GPIO4_IO18              0x19    /* phy reset */
                         MX8MP_IOMUXC_SAI1_TXD7__GPIO4_IO19              0x41    /* phy int */
                 >;
         };
