@@ -386,6 +386,8 @@ static const struct mipi_csis_event mipi_csis_events[] = {
  * @slock: spinlock protecting structure members below
  * @pkt_buf: the frame embedded (non-image) data buffer
  * @events: MIPI-CSIS event (error) counters
+ * @swap_clk: swap clk lane polarity
+ * @swap_data: swap data lanes polarity
  */
 struct csi_state {
 	struct v4l2_subdev	sd;
@@ -413,6 +415,8 @@ struct csi_state {
 	u32 num_lanes;
 	u32 max_num_lanes;
 	u8 wclk_ext;
+	u8 swap_clk;
+	u8 swap_data;
 
 	u8 vchannel;
 	const struct csis_pix_format *csis_fmt;
@@ -750,6 +754,21 @@ static void mipi_csis_set_hsync_settle(struct csi_state *state)
 	mipi_csis_write(state, MIPI_CSIS_DPHYCTRL, val);
 }
 
+static void mipi_csis_set_set_data_clock_polarity(struct csi_state *state)
+{
+	u32 val = mipi_csis_read(state, MIPI_CSIS_DPHYCTRL);
+
+	val &= ~(MIPI_CSIS_DPHYCTRL_DPDN_SWAP_CLK | MIPI_CSIS_DPHYCTRL_DPDN_SWAP_DAT);
+
+	if(state->swap_clk)
+		val |= MIPI_CSIS_DPHYCTRL_DPDN_SWAP_CLK;
+
+	if(state->swap_data)
+		val |= MIPI_CSIS_DPHYCTRL_DPDN_SWAP_DAT;
+
+	mipi_csis_write(state, MIPI_CSIS_DPHYCTRL, val);
+}
+
 static void mipi_csis_set_params(struct csi_state *state)
 {
 	u32 val;
@@ -762,6 +781,8 @@ static void mipi_csis_set_params(struct csi_state *state)
 
 	__mipi_csis_set_format(state);
 	mipi_csis_set_hsync_settle(state);
+
+	mipi_csis_set_set_data_clock_polarity(state);
 
 	val = mipi_csis_read(state, MIPI_CSIS_ISPCONFIG_CH0);
 	if (state->csis_fmt->data_alignment == 32)
@@ -1496,6 +1517,9 @@ static int mipi_csis_parse_dt(struct platform_device *pdev,
 	of_property_read_u32(node, "csis-hs-settle", &state->hs_settle);
 	of_property_read_u32(node, "csis-clk-settle", &state->clk_settle);
 	of_property_read_u32(node, "data-lanes", &state->num_lanes);
+
+	state->swap_data = of_property_read_bool(node, "swap-data");
+	state->swap_clk = of_property_read_bool(node, "swap-clk");
 
 	state->wclk_ext = of_property_read_bool(node, "csis-wclk");
 
