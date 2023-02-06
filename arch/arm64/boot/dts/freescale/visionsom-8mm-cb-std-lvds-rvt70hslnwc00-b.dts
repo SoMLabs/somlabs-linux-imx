@@ -7,10 +7,10 @@
 /dts-v1/;
 
 #include "visionsom-8mm-cb-std.dtsi"
-#include "visionsom-8mm-cb-lvds.dtsi"
+#include "visionsom-8mm-cb-rvt70hslnwc00-b.dtsi"
 
 / {
-    model = "SoMLabs VisionSOM i.MX8MM CB-STD/LVDS";
+    model = "SoMLabs VisionSOM i.MX8MM CB-STD/LVDS-RVT70HSLNWC00-B";
 };
 
 &iomuxc {
