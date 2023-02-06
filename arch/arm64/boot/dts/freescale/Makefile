@@ -76,13 +76,13 @@ dtb-$(CONFIG_ARCH_MXC) += visionsom-8mm-cb-std.dtb \
 			  visionsom-8mm-cb-std-mipi7-riverdi.dtb \
 			  visionsom-8mm-cb-std-mipi10.dtb \
 			  visionsom-8mm-cb-std-hdmi.dtb \
-			  visionsom-8mm-cb-std-lvds.dtb \
+			  visionsom-8mm-cb-std-lvds-rvt70hslnwc00-b.dtb \
 			  visionsom-8mm-cb-adv.dtb \
 			  visionsom-8mm-cb-adv-mipi7.dtb \
 			  visionsom-8mm-cb-adv-mipi7-riverdi.dtb \
 			  visionsom-8mm-cb-adv-mipi10.dtb \
 			  visionsom-8mm-cb-adv-hdmi.dtb \
-			  visionsom-8mm-cb-adv-lvds.dtb \
+			  visionsom-8mm-cb-adv-lvds-rvt70hslnwc00-b.dtb \
 			  visionsbc-8mmini.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += spacesom-8mplus-cb-adv.dtb
