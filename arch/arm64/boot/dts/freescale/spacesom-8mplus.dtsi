@@ -37,20 +37,6 @@
                 compatible = "mmc-pwrseq-simple";
                 reset-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
         };
-
-        sound-hdmi {
-                compatible = "fsl,imx-audio-cdnhdmi";
-                model = "audio-hdmi";
-                audio-cpu = <&aud2htx>;
-                hdmi-out;
-                constraint-rate = <44100>,
-                                <88200>,
-                                <176400>,
-                                <32000>,
-                                <48000>,
-                                <96000>,
-                                <192000>;
-        };
 };
 
 &A53_0 {
