@@ -27,8 +27,8 @@ static const struct drm_display_mode rvt70hsmnwc00_default_mode = {
         .clock       = 51000,
         .hdisplay    = 1024,
         .hsync_start = 1024 + 160,
-        .hsync_end   = 1024 + 160 + 10,
-        .htotal      = 1024 + 160 + 10 + 160,
+        .hsync_end   = 1024 + 160 + 80,
+        .htotal      = 1024 + 160 + 80 + 160,
         .vdisplay    = 600,
         .vsync_start = 600 + 12,
         .vsync_end   = 600 + 12 + 10,
@@ -228,7 +228,7 @@ static int rvt70hsmnwc00_probe(struct mipi_dsi_device *dsi)
 
 	dsi->lanes = 4;
 	dsi->format = MIPI_DSI_FMT_RGB888;
-	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_VIDEO_SYNC_PULSE | MIPI_DSI_MODE_LPM;
+	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_LPM | MIPI_DSI_MODE_VIDEO_BURST;
 
 	drm_panel_init(&ctx->panel, dev, &rvt70hsmnwc00_drm_funcs,
 		       DRM_MODE_CONNECTOR_DSI);
