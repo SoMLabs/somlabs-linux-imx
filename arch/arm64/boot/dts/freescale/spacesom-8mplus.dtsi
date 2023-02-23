@@ -285,6 +285,7 @@
         assigned-clocks = <&clk IMX8MP_CLK_UART1>;
         assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
         fsl,uart-has-rtscts;
+        fsl,dte-mode;
         status = "okay";
 };
 
