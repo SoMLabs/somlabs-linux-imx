@@ -153,7 +153,14 @@
 };
 
 &eqos {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_eqos>;
+        phy-int-gpios = <&gpio4 20 GPIO_ACTIVE_LOW>; /* GPIO4_20 */
+        phy-mode = "rgmii-id";
         phy-handle = <&ethphy0>;
+        snps,force_thresh_dma_mode;
+        snps,mtl-tx-config = <&mtl_tx_setup>;
+        snps,mtl-rx-config = <&mtl_rx_setup>;
         status = "okay";
 
         mdio {
@@ -165,14 +172,76 @@
                         compatible = "ethernet-phy-ieee802.3-c22";
                         reg = <1>;
                         eee-broken-1000t;
-                        rtl821x,aldps-disable;
-                        rtl821x,clkout-disable;
+                        reset-gpios = <&gpio3 16 GPIO_ACTIVE_LOW>;
+                        reset-assert-us = <10000>;
+                        reset-deassert-us = <80000>;
+                        realtek,clkout-disable;
+                };
+        };
+
+        mtl_tx_setup: tx-queues-config {
+                snps,tx-queues-to-use = <5>;
+                snps,tx-sched-sp;
+                queue0 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0x1>;
+                };
+                queue1 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0x2>;
+                };
+                queue2 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0x4>;
+                };
+                queue3 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0x8>;
+                };
+                queue4 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0xf0>;
+                };
+        };
+
+        mtl_rx_setup: rx-queues-config {
+                snps,rx-queues-to-use = <5>;
+                snps,rx-sched-sp;
+                queue0 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0x1>;
+                        snps,map-to-dma-channel = <0>;
+                };
+                queue1 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0x2>;
+                        snps,map-to-dma-channel = <1>;
+                };
+                queue2 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0x4>;
+                        snps,map-to-dma-channel = <2>;
+                };
+                queue3 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0x8>;
+                        snps,map-to-dma-channel = <3>;
+                };
+                queue4 {
+                        snps,dcb-algorithm;
+                        snps,priority = <0xf0>;
+                        snps,map-to-dma-channel = <4>;
                 };
         };
 };
 
 &fec {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_fec>;
+        phy-int-gpios = <&gpio4 19 GPIO_ACTIVE_LOW>; /* GPIO4_19 */
+        phy-mode = "rgmii-id";
         phy-handle = <&ethphy1>;
+        fsl,magic-packet;
         status = "okay";
 
         mdio {
@@ -183,8 +252,11 @@
                         compatible = "ethernet-phy-ieee802.3-c22";
                         reg = <1>;
                         eee-broken-1000t;
-                        rtl821x,aldps-disable;
-                        rtl821x,clkout-disable;
+                        reset-gpios = <&gpio4 18 GPIO_ACTIVE_LOW>;
+                        reset-assert-us = <10000>;
+                        reset-deassert-us = <80000>;
+                        realtek,aldps-enable;
+                        realtek,clkout-disable;
                 };
         };
 };
@@ -249,6 +321,57 @@
                 fsl,pins = <
                         MX8MP_IOMUXC_UART1_RXD__GPIO5_IO22              0x19
                         MX8MP_IOMUXC_UART1_TXD__GPIO5_IO23              0x19
+                >;
+        };
+
+        pinctrl_eqos: eqosgrp {
+                fsl,pins = <
+                        MX8MP_IOMUXC_ENET_MDC__ENET_QOS_MDC                             0x3
+                        MX8MP_IOMUXC_ENET_MDIO__ENET_QOS_MDIO                           0x3
+                        MX8MP_IOMUXC_ENET_RD0__ENET_QOS_RGMII_RD0                       0x91
+                        MX8MP_IOMUXC_ENET_RD1__ENET_QOS_RGMII_RD1                       0x91
+                        MX8MP_IOMUXC_ENET_RD2__ENET_QOS_RGMII_RD2                       0x91
+                        MX8MP_IOMUXC_ENET_RD3__ENET_QOS_RGMII_RD3                       0x91
+                        MX8MP_IOMUXC_ENET_RXC__CCM_ENET_QOS_CLOCK_GENERATE_RX_CLK       0x91
+                        MX8MP_IOMUXC_ENET_RX_CTL__ENET_QOS_RGMII_RX_CTL                 0x91
+                        MX8MP_IOMUXC_ENET_TD0__ENET_QOS_RGMII_TD0                       0x1f
+                        MX8MP_IOMUXC_ENET_TD1__ENET_QOS_RGMII_TD1                       0x1f
+                        MX8MP_IOMUXC_ENET_TD2__ENET_QOS_RGMII_TD2                       0x1f
+                        MX8MP_IOMUXC_ENET_TD3__ENET_QOS_RGMII_TD3                       0x1f
+                        MX8MP_IOMUXC_ENET_TX_CTL__ENET_QOS_RGMII_TX_CTL                 0x1f
+                        MX8MP_IOMUXC_ENET_TXC__CCM_ENET_QOS_CLOCK_GENERATE_TX_CLK       0x1f
+                        MX8MP_IOMUXC_NAND_READY_B__GPIO3_IO16                           0x19    /* phy reset */
+                        MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20                              0x41    /* phy int */
+                >;
+        };
+
+        pinctrl_fec: fecgrp {
+                fsl,pins = <
+                        MX8MP_IOMUXC_SAI1_RXD2__ENET1_MDC               0x3
+                        MX8MP_IOMUXC_SAI1_RXD3__ENET1_MDIO              0x3
+                        MX8MP_IOMUXC_SAI1_RXD4__ENET1_RGMII_RD0         0x91
+                        MX8MP_IOMUXC_SAI1_RXD5__ENET1_RGMII_RD1         0x91
+                        MX8MP_IOMUXC_SAI1_RXD6__ENET1_RGMII_RD2         0x91
+                        MX8MP_IOMUXC_SAI1_RXD7__ENET1_RGMII_RD3         0x91
+                        MX8MP_IOMUXC_SAI1_TXC__ENET1_RGMII_RXC          0x91
+                        MX8MP_IOMUXC_SAI1_TXFS__ENET1_RGMII_RX_CTL      0x91
+                        MX8MP_IOMUXC_SAI1_TXD0__ENET1_RGMII_TD0         0x1f
+                        MX8MP_IOMUXC_SAI1_TXD1__ENET1_RGMII_TD1         0x1f
+                        MX8MP_IOMUXC_SAI1_TXD2__ENET1_RGMII_TD2         0x1f
+                        MX8MP_IOMUXC_SAI1_TXD3__ENET1_RGMII_TD3         0x1f
+                        MX8MP_IOMUXC_SAI1_TXD4__ENET1_RGMII_TX_CTL      0x1f
+                        MX8MP_IOMUXC_SAI1_TXD5__ENET1_RGMII_TXC         0x1f
+                        MX8MP_IOMUXC_SAI1_TXD6__GPIO4_IO18              0x19    /* phy reset */
+                        MX8MP_IOMUXC_SAI1_TXD7__GPIO4_IO19              0x41    /* phy int */
+                >;
+        };
+
+        pinctrl_fec_1588: fec1588grp {
+                fsl,pins = <
+                        MX8MP_IOMUXC_SAI1_RXFS__ENET1_1588_EVENT0_IN    0x91
+                        MX8MP_IOMUXC_SAI1_RXC__ENET1_1588_EVENT0_OUT    0x1f
+                        MX8MP_IOMUXC_SAI1_RXD0__ENET1_1588_EVENT1_IN    0x91
+                        MX8MP_IOMUXC_SAI1_RXD1__ENET1_1588_EVENT1_OUT   0x1f
                 >;
         };
 
