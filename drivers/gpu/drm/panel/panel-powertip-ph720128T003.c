@@ -10,6 +10,7 @@
 #include <linux/errno.h>
 #include <linux/fb.h>
 #include <linux/kernel.h>
+#include <linux/media-bus-format.h>
 #include <linux/module.h>
 
 #include <linux/gpio/consumer.h>
@@ -542,7 +543,7 @@ static int ph720128t003_dsi_probe(struct mipi_dsi_device *dsi)
 	return ret;
 }
 
-static int ph720128t003_dsi_remove(struct mipi_dsi_device *dsi)
+static void ph720128t003_dsi_remove(struct mipi_dsi_device *dsi)
 {
 	struct ph720128t003 *ctx = mipi_dsi_get_drvdata(dsi);
 
@@ -551,8 +552,6 @@ static int ph720128t003_dsi_remove(struct mipi_dsi_device *dsi)
 
 	if (ctx->backlight)
 		put_device(&ctx->backlight->dev);
-
-	return 0;
 }
 
 static const struct of_device_id ph720128t003_of_match[] = {
