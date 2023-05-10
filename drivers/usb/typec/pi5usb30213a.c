@@ -298,14 +298,12 @@ err_put_fwnode:
 	return ret;
 }
 
-static int pi5usb30213a_remove(struct i2c_client *client)
+static void pi5usb30213a_remove(struct i2c_client *client)
 {
 	struct pi5usb30213a *pi5usb30213a = i2c_get_clientdata(client);
 
 	typec_unregister_port(pi5usb30213a->port);
 	usb_role_switch_put(pi5usb30213a->role_sw);
-
-	return 0;
 }
 
 static const struct of_device_id dev_ids[] = {

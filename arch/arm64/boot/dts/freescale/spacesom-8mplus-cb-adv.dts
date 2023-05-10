@@ -4,6 +4,7 @@
  *
  */
 
+#include <dt-bindings/phy/phy-imx8-pcie.h>
 #include <dt-bindings/pwm/pwm.h>
 
 #include "spacesom-8mplus.dtsi"
@@ -424,11 +425,12 @@
 };
 
 &usdhc1 {
+        assigned-clocks = <&clk IMX8MP_CLK_USDHC1>;
+        assigned-clock-rates = <400000000>;
         pinctrl-names = "default";
-        pinctrl-0 = <&pinctrl_usdhc1 &pinctrl_usdhc1_gpio>;
-
+        pinctrl-0 = <&pinctrl_usdhc1>, <&pinctrl_usdhc1_gpio>;
         cd-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
-        no-1-8-v;           //todo: PMIC allows to control SD card voltage, add support for this in software/dts
+        no-1-8-v;
         bus-width = <4>;
         fsl,delay-line = <8>;
         status = "okay";
@@ -538,24 +540,26 @@
 
 &pcie{
         pinctrl-names = "default";
-        // pinctrl-0 = <&pinctrl_pcie>;
-        // disable-gpio = <&gpio2 6 GPIO_ACTIVE_LOW>;
-        // reset-gpio = <&gpio2 7 GPIO_ACTIVE_LOW>;
         clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
-                <&clk IMX8MP_CLK_PCIE_AUX>,
-                <&clk IMX8MP_CLK_HSIO_AXI>,
-                <&clk IMX8MP_CLK_PCIE_ROOT>;
-        clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
-        assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>,
-                          <&clk IMX8MP_CLK_PCIE_AUX>;
-        assigned-clock-rates = <500000000>, <10000000>;
-        assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>,
-                                <&clk IMX8MP_SYS_PLL2_50M>;
-        ext_osc = <0>;
-        status = "okay";
+                 <&clk IMX8MP_CLK_PCIE_AUX>,
+                 <&clk IMX8MP_CLK_PCIE_ROOT>;
+        clock-names = "pcie", "pcie_aux", "pcie_bus";
+        assigned-clocks = <&clk IMX8MP_CLK_PCIE_AUX>;
+        assigned-clock-rates = <10000000>;
+        assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_50M>;
+        l1ss-disabled;
 };
 
-&pcie_phy{
+&pcie_phy {
+        clocks = <&clk IMX8MP_CLK_HSIO_AXI>;
+        clock-names = "pcie_phy";
+        assigned-clocks =  <&clk IMX8MP_CLK_HSIO_AXI>;
+        assigned-clock-rates = <500000000>;
+        assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>;
+        fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
+        fsl,clkreq-unsupported;
+        fsl,tx-deemph-gen1 = <0x2d>;
+        fsl,tx-deemph-gen2 = <0xf>;
         ext_osc = <0>;
         status = "okay";
 };
