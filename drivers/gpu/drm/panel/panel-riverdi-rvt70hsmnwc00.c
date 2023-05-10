@@ -249,15 +249,12 @@ static int rvt70hsmnwc00_probe(struct mipi_dsi_device *dsi)
 	return 0;
 }
 
-static int rvt70hsmnwc00_remove(struct mipi_dsi_device *dsi)
+static void rvt70hsmnwc00_remove(struct mipi_dsi_device *dsi)
 {
 	struct rvt70hsmnwc00 *ctx = mipi_dsi_get_drvdata(dsi);
-	struct device *dev = &dsi->dev;
 
 	mipi_dsi_detach(dsi);
 	drm_panel_remove(&ctx->panel);
-
-	return 0;
 }
 
 static const struct of_device_id riverdi_rvt70hsmnwc00_of_match[] = {
