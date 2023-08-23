@@ -4,17 +4,8 @@
  *
  */
 
+#include <dt-bindings/phy/phy-imx8-pcie.h>
 #include "visionsom-8mm-cb.dtsi"
-
-/ {
-    clocks {
-        pcie0_refclk: pcie0-refclk {
-            compatible = "fixed-clock";
-            #clock-cells = <0>;
-            clock-frequency = <100000000>;
-        };
-    };
-};
 
 &iomuxc {
     pinctrl_csi: csi_grp {
@@ -73,20 +64,25 @@
     };
 };
 
+&pcie_phy {
+    status = "okay";
+    clocks = <&clk IMX8MM_CLK_PCIE1_PHY>;
+    fsl,clkreq-unsupported;
+    fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
+    fsl,tx-deemph-gen1 = <0x2d>;
+    fsl,tx-deemph-gen2 = <0xf>;
+};
+
 &pcie0{
     clocks = <&clk IMX8MM_CLK_PCIE1_ROOT>,
-        <&clk IMX8MM_CLK_PCIE1_AUX>,
-        <&clk IMX8MM_CLK_PCIE1_PHY>,
-        <&pcie0_refclk>;
-    clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+         <&clk IMX8MM_CLK_PCIE1_AUX>,
+         <&clk IMX8MM_CLK_PCIE1_PHY>;
+    clock-names = "pcie", "pcie_aux", "pcie_bus";
     assigned-clocks = <&clk IMX8MM_CLK_PCIE1_AUX>,
-                      <&clk IMX8MM_CLK_PCIE1_PHY>,
                       <&clk IMX8MM_CLK_PCIE1_CTRL>;
-    assigned-clock-rates = <10000000>, <100000000>, <250000000>;
+    assigned-clock-rates = <10000000>, <250000000>;
     assigned-clock-parents = <&clk IMX8MM_SYS_PLL2_50M>,
-                             <&clk IMX8MM_SYS_PLL2_100M>,
                              <&clk IMX8MM_SYS_PLL2_250M>;
-    reserved-region = <&rpmsg_reserved>;
     ext_osc = <0>;
     status = "okay";
 };
