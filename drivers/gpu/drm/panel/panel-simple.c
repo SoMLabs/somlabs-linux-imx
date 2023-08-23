@@ -3447,7 +3447,9 @@ static const struct panel_desc riverdi_rvt70hslnwc00_b = {
 		.unprepare = 10,
 		.disable = 10,
 	},
-	.bus_format = MEDIA_BUS_FMT_RGB888_1X24,
+	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
+	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
+	.connector_type = DRM_MODE_CONNECTOR_LVDS,
 };
 
 static const struct display_timing rocktech_rk043fn48h_timing = {
