@@ -37,16 +37,15 @@
 	leds {
 		compatible = "gpio-leds";
 
-		usr0 {
-			label = "sys";
+		led-io-14 {
+			label = "LED-IO-14";
 			gpios = <&gpio2 14 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "heartbeat";
 		};
 
-		usr1 {
-			label = "usr";
+		led-io-19 {
+			label = "LED-IO-19";
 			gpios = <&gpio3 19 GPIO_ACTIVE_HIGH>;
-			linux,default-trigger = "mmc1";
 		};
 	};
 
