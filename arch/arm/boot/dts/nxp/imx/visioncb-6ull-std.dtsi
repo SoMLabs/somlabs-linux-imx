@@ -18,26 +18,24 @@
         leds {
                 compatible = "gpio-leds";
 
-                usr0 {
-                        label = "usr0";
+                led-io-10 {
+                        label = "LED-IO-10";
                         gpios = <&gpio1 10 GPIO_ACTIVE_HIGH>;
                         linux,default-trigger = "heartbeat";
                 };
 
-                usr1 {
-                        label = "usr1";
+                led-io-11 {
+                        label = "LED-IO-11";
                         gpios = <&gpio1 11 GPIO_ACTIVE_HIGH>;
-                        linux,default-trigger = "mmc0";
                 };
 
-                usr2 {
-                        label = "usr2";
+                led-io-13 {
+                        label = "LED-IO-13";
                         gpios = <&gpio1 13 GPIO_ACTIVE_HIGH>;
-                        linux,default-trigger = "mmc1";
                 };
 
-                usr3 {
-                        label = "usr3";
+                led-io-12 {
+                        label = "LED-IO-12";
                         gpios = <&gpio1 12 GPIO_ACTIVE_HIGH>;
                 };
         };
