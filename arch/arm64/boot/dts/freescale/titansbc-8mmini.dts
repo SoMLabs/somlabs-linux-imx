@@ -10,8 +10,8 @@
 #include "imx8mm.dtsi"
 
 / {
-    model = "SoMLabs VisionSBC-MX8MMini";
-    compatible = "somlabs,visionsom-8mmini", "fsl,imx8mm";
+    model = "SoMLabs TitanSBC-8Mmini";
+    compatible = "somlabs,titansbc-8mmini", "fsl,imx8mm";
 
     reserved-memory {
         #address-cells = <2>;
