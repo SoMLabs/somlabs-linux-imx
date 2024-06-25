@@ -54,7 +54,8 @@ struct lt8912 {
 	struct gpio_desc *reset_n;
 	struct i2c_adapter *ddc;        /* optional regular DDC I2C bus */
 	bool swap_mipi_pn;
-	bool lvds_mode;					/* false - HDMI output, true - LVDS output */
+	bool hdmi_enabled;
+	bool lvds_enabled;
 	u8 audio_mode;					/* selected audio mode - valid only for HDMI output */
 };
 
@@ -244,7 +245,7 @@ static void lt8912_init(struct lt8912 *lt)
 	regmap_write(lt->regmap[0], 0x0c, 0xff);
 
 	/* TxAnalog */
-	if(!lt->lvds_mode) {
+	if(lt->hdmi_enabled) {
 		regmap_write(lt->regmap[0], 0x31, 0xa1);
 		regmap_write(lt->regmap[0], 0x32, 0xa1);
 		regmap_write(lt->regmap[0], 0x33, 0x03);
@@ -296,10 +297,9 @@ static void lt8912_init(struct lt8912 *lt)
 	usleep_range(10000, 20000);
 	regmap_write(lt->regmap[1], 0x51, 0x00);
 
-	if(lt->lvds_mode){
+	if(lt->lvds_enabled){
 		lt8912_configure_lvds(lt);
 	}
-
 }
 
 static void lt8912_wakeup(struct lt8912 *lt)
@@ -336,7 +336,8 @@ lt8912_connector_detect(struct drm_connector *connector, bool force)
 	enum drm_connector_status hpd, hpd_last;
 	int timeout = 0;
 
-	if (lt->lvds_mode) {
+	// If LVDS is enabled ignore HPD to keep display output enabled
+	if (lt->lvds_enabled) {
 		hpd = connector_status_connected;
 	} else {
 		hpd = connector_status_unknown;
@@ -390,7 +391,8 @@ static int lt8912_connector_get_modes(struct drm_connector *connector)
 	u32 bus_format = MEDIA_BUS_FMT_RGB888_1X24;
 	int i, ret, num_modes = 0;
 
-	if (lt->lvds_mode) {
+	// If LVDS is enabled force the LVDS resolution and mode to both displays
+	if (lt->lvds_enabled) {
 		ret = drm_panel_get_modes(lt->lvds_panel, connector);
 	} else {
 
@@ -488,7 +490,7 @@ static void lt8912_bridge_post_disable(struct drm_bridge *bridge)
 	struct lt8912 *lt = bridge_to_lt8912(bridge);
 	lt8912_sleep(lt);
 
-	if(lt->lvds_panel) {
+	if(lt->lvds_enabled) {
 		drm_panel_unprepare(lt->lvds_panel);
 	}
 }
@@ -569,16 +571,14 @@ static int lt8912_bridge_attach(struct drm_bridge *bridge, enum drm_bridge_attac
 
         // get lvds panel
         drm_of_find_panel_or_bridge(lt->dev->of_node, 2, 0, &lt->lvds_panel, NULL);
+	if(lt->lvds_panel)
+		lt->lvds_enabled = true;
 
         // get hdmi_connector node
         lt->hdmi_connector = of_graph_get_remote_node(lt->dev->of_node, 1, 0);
         if (lt->hdmi_connector) {
                 of_node_put(lt->hdmi_connector);
-        }
-
-        if(lt->hdmi_connector && lt->lvds_panel) {
-                dev_err(lt->dev, "do not specify both LVDS panel and HDMI connector! Only one output is supported!\n");
-                return -EINVAL;
+		lt->hdmi_enabled = true;
         }
 
         // if no panel or connector can be found, try again later after drm gets fully initialized
@@ -589,11 +589,9 @@ static int lt8912_bridge_attach(struct drm_bridge *bridge, enum drm_bridge_attac
         if(lt->hdmi_connector){
                 lt8912_get_hpd_gpio(lt->dev, lt);
                 lt->audio_host = of_graph_get_remote_node(lt->dev->of_node, 3, 0);
-        } else {
-                lt->lvds_mode = true;
         }
 
-	type = lt->lvds_mode?DRM_MODE_CONNECTOR_LVDS:DRM_MODE_CONNECTOR_HDMIA;
+	type = lt->lvds_enabled?DRM_MODE_CONNECTOR_LVDS:DRM_MODE_CONNECTOR_HDMIA;
 
 	connector->polled = DRM_CONNECTOR_POLL_HPD;
 	ret = drm_connector_init(bridge->dev, connector,
@@ -606,7 +604,7 @@ static int lt8912_bridge_attach(struct drm_bridge *bridge, enum drm_bridge_attac
 	drm_connector_helper_add(connector, &lt8912_connector_helper_funcs);
 	drm_connector_attach_encoder(connector, bridge->encoder);
 
-	if(lt->lvds_mode) {
+	if(lt->lvds_enabled) {
 		drm_bridge_attach(bridge->encoder, &lt->bridge, bridge, flags);
 	}
 
@@ -614,7 +612,8 @@ static int lt8912_bridge_attach(struct drm_bridge *bridge, enum drm_bridge_attac
 
 	connector->funcs->reset(connector);
 
-	if (!lt->lvds_mode) {
+	// Do not use HPD signal when LVDS is enabled
+	if (!lt->lvds_enabled) {
 		enable_irq(lt->irq);
 	}
 
@@ -625,7 +624,7 @@ static void lt8912_bridge_detach(struct drm_bridge *bridge)
 {
 	struct lt8912 *lt = bridge_to_lt8912(bridge);
 
-	if(!lt->lvds_mode) {
+	if(!lt->lvds_enabled) {
 		disable_irq(lt->irq);
 	}
 }
