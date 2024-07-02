@@ -580,6 +580,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-frdm.dtb \
 
 imx91-11x11-frdm-tianma-wvga-panel-dtbs := imx91-11x11-frdm.dtb imx91-11x11-frdm-tianma-wvga-panel.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx91-11x11-frdm-tianma-wvga-panel.dtb
+dtb-$(CONFIG_ARCH_MXC) += visionsom-imx93-cb-std.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += imx93-9x9-qsb.dtb \
 			  imx93-9x9-qsb-can1.dtb \
