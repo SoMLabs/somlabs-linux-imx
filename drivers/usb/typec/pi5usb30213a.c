@@ -217,8 +217,7 @@ static irqreturn_t pi5usb30213a_irq_handler(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-static int pi5usb30213a_probe(struct i2c_client *client,
-		const struct i2c_device_id *id)
+static int pi5usb30213a_probe(struct i2c_client *client)
 {
 	struct typec_capability typec_cap = { };
 	struct pi5usb30213a *pi5usb30213a;
