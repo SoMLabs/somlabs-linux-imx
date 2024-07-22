@@ -785,7 +785,7 @@
 
 &uart2 {
     pinctrl-0 = <&pinctrl_uart2 &pinctrl_uart2_rts>;
-    rts-gpios = <&gpio5 5 GPIO_ACTIVE_LOW>;
+    rts-gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;
     linux,rs485-enabled-at-boot-time;
     status = "okay";
 };
