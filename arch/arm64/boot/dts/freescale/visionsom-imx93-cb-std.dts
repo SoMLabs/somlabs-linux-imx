@@ -162,7 +162,6 @@
 	pinctrl-0 = <&pinctrl_eqos>, <&pinctrl_eqos_phyctrl>;
 	pinctrl-1 = <&pinctrl_eqos_sleep>, <&pinctrl_eqos_phyctrl>;
 	phy-mode = "rgmii-id";
-	phy-int-gpios = <&gpio4 29 GPIO_ACTIVE_LOW>; /* GPIO4_IO29 */
 	status = "okay";
 	phy-handle = <&ethphy1>;
 
@@ -173,9 +172,14 @@
 		clock-frequency = <5000000>;
 
 		ethphy1: ethernet-phy@0 {
+			reg = <0>;
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reset-gpios = <&gpio4 28 GPIO_ACTIVE_LOW>;	/* GPIO4_IO28 */
-			reg = <0>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <300>;
+
+			interrupt-parent = <&gpio4>;
+			interrupts = <29 IRQ_TYPE_LEVEL_LOW>;		/* GPIO4_IO29 */
 		};
 	};
 };
@@ -185,7 +189,7 @@
 	pinctrl-0 = <&pinctrl_fec>, <&pinctrl_fec_phyctrl>;
 	pinctrl-1 = <&pinctrl_fec_sleep>, <&pinctrl_fec_phyctrl>;
 	phy-mode = "rgmii-id";
-	phy-int-gpios = <&gpio3 27 GPIO_ACTIVE_LOW>; /* GPIO3_IO27 */
+	phy-int-gpios = <&gpio3 27 GPIO_ACTIVE_LOW>;
 	fsl,magic-packet;
 	status = "okay";
 	phy-handle = <&ethphy2>;
@@ -196,9 +200,14 @@
 		clock-frequency = <5000000>;
 
 		ethphy2: ethernet-phy@0 {
+			reg = <0>;
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reset-gpios = <&gpio3 26 GPIO_ACTIVE_LOW>;	/* GPIO3_IO26 */
-			reg = <0>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <300>;
+
+			interrupt-parent = <&gpio3>;
+			interrupts = <27 IRQ_TYPE_LEVEL_LOW>;		 /* GPIO3_IO27 */
 		};
 
 	};
@@ -267,7 +276,6 @@
 	hnp-disable;
 	srp-disable;
 	adp-disable;
-	usb-role-switch;
 	disable-over-current;
 	samsung,picophy-pre-emp-curr-control = <3>;
 	samsung,picophy-dc-vol-level-adjust = <7>;
