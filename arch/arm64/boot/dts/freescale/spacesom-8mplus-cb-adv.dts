@@ -161,7 +161,6 @@
 &eqos {
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_eqos>;
-        phy-int-gpios = <&gpio4 20 GPIO_ACTIVE_LOW>; /* GPIO4_20 */
         phy-mode = "rgmii-id";
         phy-handle = <&ethphy0>;
         snps,force_thresh_dma_mode;
@@ -182,6 +181,8 @@
                         reset-assert-us = <10000>;
                         reset-deassert-us = <80000>;
                         realtek,clkout-disable;
+                        interrupt-parent = <&gpio4>;
+                        interrupts = <20 IRQ_TYPE_LEVEL_LOW>;
                 };
         };
 
@@ -244,7 +245,6 @@
 &fec {
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_fec>;
-        phy-int-gpios = <&gpio4 19 GPIO_ACTIVE_LOW>; /* GPIO4_19 */
         phy-mode = "rgmii-id";
         phy-handle = <&ethphy1>;
         fsl,magic-packet;
@@ -263,6 +263,8 @@
                         reset-deassert-us = <80000>;
                         realtek,aldps-enable;
                         realtek,clkout-disable;
+                        interrupt-parent = <&gpio4>;
+                        interrupts = <19 IRQ_TYPE_LEVEL_LOW>;
                 };
         };
 };
