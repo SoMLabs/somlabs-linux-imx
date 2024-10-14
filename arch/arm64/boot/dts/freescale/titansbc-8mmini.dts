@@ -388,7 +388,6 @@
     phy-reset-gpios = <&gpio4 14 GPIO_ACTIVE_LOW>; /* GPIO4_14 */
     phy-reset-duration = <10>;
     phy-reset-post-delay = <50>;
-    phy-int-gpios = <&gpio5 6 GPIO_ACTIVE_LOW>; /* GPIO5_6 */
     fsl,magic-packet;
     status = "okay";
 
@@ -399,6 +398,8 @@
         ethphy1: ethernet-phy@1 {
             compatible = "ethernet-phy-ieee802.3-c22";
             reg = <1>;
+            interrupt-parent = <&gpio5>;
+            interrupts = <6 IRQ_TYPE_LEVEL_LOW>;
         };
     };
 };

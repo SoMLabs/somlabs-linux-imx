@@ -189,7 +189,6 @@
 	pinctrl-0 = <&pinctrl_fec>, <&pinctrl_fec_phyctrl>;
 	pinctrl-1 = <&pinctrl_fec_sleep>, <&pinctrl_fec_phyctrl>;
 	phy-mode = "rgmii-id";
-	phy-int-gpios = <&gpio3 27 GPIO_ACTIVE_LOW>;
 	fsl,magic-packet;
 	status = "okay";
 	phy-handle = <&ethphy2>;
