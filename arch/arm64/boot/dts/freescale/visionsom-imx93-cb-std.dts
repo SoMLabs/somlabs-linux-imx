@@ -90,8 +90,8 @@
 	dsi_panel_backlight: panel-backlight {
 		compatible = "pwm-backlight";
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_panel_backlight_en>, <&pinctrl_panel_backlight_pwm>;
-		pwms = <&tpm1 3 5000000 0>;
+		pinctrl-0 = <&pinctrl_panel_backlight_en>;
+		pwms = <&tpm1 3 5000000 PWM_POLARITY_INVERTED>;
 
 		brightness-levels = <0 4 8 16 32 64 128 255>;
 		default-brightness-level = <7>;
@@ -213,6 +213,8 @@
 };
 
 &tpm1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_panel_backlight_pwm>;
 	status = "okay";
 };
 
@@ -238,7 +240,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_panel_reset>;
 		reset-gpios = <&gpio2 11 GPIO_ACTIVE_LOW>;
-		// backlight = <&dsi_panel_backlight>;
+		backlight = <&dsi_panel_backlight>;
 		status = "okay";
 		port {
 			panel_in: endpoint {
