@@ -1,0 +1,342 @@
+
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright 2024 SomLabs
+ *
+ */
+
+/dts-v1/;
+
+#include "visionsom-imx93.dtsi"
+#include <dt-bindings/pwm/pwm.h>
+
+/ {
+	leds {
+		led-io-02 {
+			label = "LED-IO-00";
+			gpios = <&gpioexp 0 1>;
+			default-state = "off";
+		};
+		led-io-05 {
+			label = "LED-IO-01";
+			gpios = <&gpioexp 1 1>;
+			default-state = "off";
+		};
+		led-io-06 {
+			label = "LED-IO-07";
+			gpios = <&gpioexp 7 1>;
+			default-state = "off";
+		};
+		led-io-07 {
+			label = "LED-IO-06";
+			gpios = <&gpioexp 6 1>;
+			default-state = "off";
+		};
+	};
+
+	gpio_buttons: gpio_buttons0 {
+		compatible = "gpio-keys";
+		poll-interval = <100>;
+
+		switch1 {
+			label = "BTN-IO-00";
+			linux,code = <0x100>;
+			gpios = <&gpioexp 2 GPIO_ACTIVE_LOW>;
+		};
+
+		switch2 {
+			label = "BTN-IO-01";
+			linux,code = <0x101>;
+			gpios = <&gpioexp 3 GPIO_ACTIVE_LOW>;
+		};
+
+		switch3 {
+			label = "BTN-IO-02";
+			linux,code = <0x102>;
+			gpios = <&gpioexp 4 GPIO_ACTIVE_LOW>;
+		};
+
+		switch4 {
+			label = "BTN-IO-00";
+			linux,code = <0x103>;
+			gpios = <&gpioexp 5 GPIO_ACTIVE_LOW>;
+		};
+	};
+
+	reg_usb_otg1_vbus: regulator-usbotg1-vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usb_otg1>;
+		regulator-name = "usb_otg1_vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio2 22 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	reg_usb_otg2_vbus: regulator-usbotg2-vbus {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usb_otg2>;
+		regulator-name = "usb_otg2_vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&gpio2 23 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+	};
+
+	sound {
+		/* generic sound card */
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "nau8822";
+
+		simple-audio-card,widgets =
+			"Headphones", "Headphones",
+			"Line Out", "Line Out",
+			"Speaker", "Speaker",
+			"Microphone", "Mic In";
+		simple-audio-card,routing =
+			"Headphones", "LHP",
+			"Headphones", "RHP",
+			"Speaker", "LSPK",
+			"Speaker", "RSPK",
+			"Line Out", "AUXOUT1",
+			"Line Out", "AUXOUT2",
+			"LMICP",    "Mic In",
+			"RMICP",    "Mic In";
+
+		simple-audio-card,format = "i2s";
+		simple-audio-card,bitclock-master = <&dailink_master>;
+		simple-audio-card,frame-master = <&dailink_master>;
+
+		dailink_master: simple-audio-card,cpu {
+			sound-dai = <&sai1>;
+		};
+
+		simple-audio-card,codec {
+			sound-dai = <&codec_nau8822>;
+			clocks = <&clk IMX93_CLK_SAI1>;
+		};
+	};
+
+	clk_ext_camera: clk_ext_camera {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <24000000>;
+	};
+};
+
+&sai1 {
+	status = "okay";
+};
+
+&eqos {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_eqos>, <&pinctrl_eqos_phyctrl>;
+	pinctrl-1 = <&pinctrl_eqos_sleep>, <&pinctrl_eqos_phyctrl>;
+	phy-mode = "rgmii-id";
+	status = "okay";
+	phy-handle = <&ethphy1>;
+
+	mdio {
+		compatible = "snps,dwmac-mdio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clock-frequency = <5000000>;
+
+		ethphy1: ethernet-phy@0 {
+			reg = <0>;
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reset-gpios = <&gpio4 28 GPIO_ACTIVE_LOW>;	/* GPIO4_IO28 */
+			reset-assert-us = <10000>;
+			reset-deassert-us = <300>;
+
+			interrupt-parent = <&gpio4>;
+			interrupts = <29 IRQ_TYPE_LEVEL_LOW>;		/* GPIO4_IO29 */
+		};
+	};
+};
+
+&fec {
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_fec>, <&pinctrl_fec_phyctrl>;
+	pinctrl-1 = <&pinctrl_fec_sleep>, <&pinctrl_fec_phyctrl>;
+	phy-mode = "rgmii-id";
+	fsl,magic-packet;
+	status = "okay";
+	phy-handle = <&ethphy2>;
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		clock-frequency = <5000000>;
+
+		ethphy2: ethernet-phy@0 {
+			reg = <0>;
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reset-gpios = <&gpio3 26 GPIO_ACTIVE_LOW>;	/* GPIO3_IO26 */
+			reset-assert-us = <10000>;
+			reset-deassert-us = <300>;
+
+			interrupt-parent = <&gpio3>;
+			interrupts = <27 IRQ_TYPE_LEVEL_LOW>;		 /* GPIO3_IO27 */
+		};
+
+	};
+};
+
+&usdhc2 {
+	broken-cd;
+	no-1-8-v;
+	status = "okay";
+};
+
+&usbotg1 {
+	dr_mode = "otg";
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	disable-over-current;
+	samsung,picophy-pre-emp-curr-control = <3>;
+	samsung,picophy-dc-vol-level-adjust = <7>;
+
+	vbus-supply = <&reg_usb_otg1_vbus>;
+
+	status = "okay";
+};
+
+&usbotg2 {
+	dr_mode = "host";
+	hnp-disable;
+	srp-disable;
+	adp-disable;
+	disable-over-current;
+	samsung,picophy-pre-emp-curr-control = <3>;
+	samsung,picophy-dc-vol-level-adjust = <7>;
+
+	vbus-supply = <&reg_usb_otg2_vbus>;
+
+	status = "okay";
+};
+
+&lpi2c1 {
+
+	ov5640: camera@3c {
+		compatible = "ovti,ov5640";
+		reg = <0x3c>;
+		clock-names = "xclk";
+		clocks = <&clk_ext_camera>;
+
+		reset-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;	// MX93_PAD_GPIO_IO18__GPIO2_IO18
+		powerdown-gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>;	// MX93_PAD_GPIO_IO19__GPIO2_IO19
+
+		status = "okay";
+
+		port {
+			ov5640_to_csi: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+				remote-endpoint = <&mipi_csi_ep>;
+			};
+		};
+	};
+};
+
+&lpi2c8 {
+	status = "okay";
+
+	gpioexp: gpio@38 {
+		compatible = "nxp,pcf8574a";
+		reg = <0x38>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpioexp>;
+
+		interrupt-parent = <&gpio2>;
+		interrupts = <27 IRQ_TYPE_LEVEL_LOW>; /* GPIO2-IO27 */
+		interrupt-controller;
+		#interrupt-cells = <2>;
+
+		gpio-controller;
+		#gpio-cells = <2>;
+		gpio-line-names =
+			"I2C-EXP-0",
+			"I2C-EXP-1",
+			"I2C-EXP-2",
+			"I2C-EXP-3",
+			"I2C-EXP-4",
+			"I2C-EXP-5",
+			"I2C-EXP-6",
+			"I2C-EXP-7";
+	};
+
+	codec_nau8822: nau8822@1a {
+		compatible = "nuvoton,nau8822";
+		reg = <0x1a>;
+		#sound-dai-cells = <0>;
+		status = "okay";
+	};
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+};
+
+&mipi_csi {
+	status = "okay";
+
+	port {
+		mipi_csi_ep: endpoint {
+			remote-endpoint = <&ov5640_to_csi>;
+			clock-lanes = <0>;
+			data-lanes = <2>;
+			cfg-clk-range = <28>;
+			hs-clk-range = <0x16>;
+			bus-type = <4>;
+		};
+	};
+};
+
+&lpuart5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart5>;
+	linux,rs485-enabled-at-boot-time;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_usb_otg1: usbotg1grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO22__GPIO2_IO22			0x31e	/* USB1 VBUS EN */
+			MX93_PAD_SD2_RESET_B__GPIO3_IO07		0x31e	/* USB1 VBUS OC */
+		>;
+	};
+
+	pinctrl_usb_otg2: usbotg2grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO23__GPIO2_IO23			0x31e	/* USB2 VBUS EN */
+			MX93_PAD_SD2_CD_B__GPIO3_IO00			0x31e	/* USB2 VBUS OC */
+		>;
+	};
+
+	pinctrl_camera: cameragrp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO19__GPIO2_IO19			0x31e	/* PW EN */
+			MX93_PAD_GPIO_IO18__GPIO2_IO18			0x31e	/* RESET */
+		>;
+	};
+
+	pinctrl_gpioexp: gpioexp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO27__GPIO2_IO27			0x31e	/* GPIO2_IO27 interrupt */
+		>;
+	};
+};

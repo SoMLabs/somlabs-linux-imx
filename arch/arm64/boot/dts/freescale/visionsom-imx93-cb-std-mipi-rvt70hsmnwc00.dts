@@ -1,0 +1,106 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright 2020 SomLabs
+ *
+ */
+
+#include "visionsom-imx93-cb-std.dtsi"
+
+/ {
+	model = "SoMLabs VisionSOM-IMX93 CB-STD/MIPI7-RVT70HSMNWC00";
+
+        dsi_panel_backlight: panel-backlight {
+		compatible = "pwm-backlight";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_panel_backlight_en>;
+		pwms = <&tpm1 3 5000000 PWM_POLARITY_INVERTED>;
+
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+
+		enable-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
+
+		status = "okay";
+        };
+};
+
+&tpm1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_panel_backlight_pwm>;
+	status = "okay";
+};
+
+&dsi {
+	status = "okay";
+
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	ports {
+		port@1 {
+			reg = <1>;
+			dsi_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+
+	panel@0 {
+		compatible = "riverdi,rvt70hsmnwc00";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_panel_reset>;
+		reset-gpios = <&gpio2 11 GPIO_ACTIVE_LOW>;
+		backlight = <&dsi_panel_backlight>;
+		status = "okay";
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&dsi_out>;
+			};
+		};
+	};
+};
+
+&lpi2c1 {
+	ili2132a_touch: ili2132a@41 {
+		compatible = "ilitek,ili2132";
+		reg = <0x41>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_touch>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <9 IRQ_TYPE_EDGE_FALLING>;
+		reset-gpios = <&gpio2 8 GPIO_ACTIVE_LOW>;
+		status = "okay";
+	};
+};
+
+&epxp {
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_panel_backlight_en: panel_backlight_en {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO10__GPIO2_IO10                  0x31e
+		>;
+	};
+
+	pinctrl_panel_backlight_pwm: panel_backlight_pwm {
+		fsl,pins = <
+			MX93_PAD_UART2_TXD__TPM1_CH3                    0x31e
+		>;
+	};
+
+	pinctrl_panel_reset: panelrstgrp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO11__GPIO2_IO11                  0x31e
+		>;
+	};
+
+	pinctrl_touch: touchgpio {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO09__GPIO2_IO09                  0x31e
+			MX93_PAD_GPIO_IO08__GPIO2_IO08                  0x31e
+		>;
+	};
+};
