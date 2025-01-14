@@ -46,6 +46,14 @@
 	};
 };
 
+&dphy {
+	status = "disabled";
+};
+
+&dsi {
+	status = "disabled";
+};
+
 &ldb_phy {
 	status = "okay";
 };
