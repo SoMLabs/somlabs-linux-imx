@@ -764,6 +764,12 @@ static int ti_sn_bridge_attach(struct drm_bridge *bridge,
 
 	drm_connector_attach_encoder(pdata->connector, pdata->bridge.encoder);
 
+	ret = ti_sn_attach_host(pdata->bridge_aux, pdata);
+	if (ret) {
+		dev_err_probe(pdata->dev, ret, "failed to attach dsi host\n");
+		goto err_initted_aux;
+	}
+
 	return 0;
 
 err_initted_aux:
@@ -1321,17 +1327,8 @@ static int ti_sn_bridge_probe(struct auxiliary_device *adev,
 
 	drm_bridge_add(&pdata->bridge);
 
-	ret = ti_sn_attach_host(adev, pdata);
-	if (ret) {
-		dev_err_probe(&adev->dev, ret, "failed to attach dsi host\n");
-		goto err_remove_bridge;
-	}
-
 	return 0;
 
-err_remove_bridge:
-	drm_bridge_remove(&pdata->bridge);
-	return ret;
 }
 
 static void ti_sn_bridge_remove(struct auxiliary_device *adev)
