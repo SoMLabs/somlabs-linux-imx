@@ -117,6 +117,29 @@
                 status = "okay";
         };
 
+        connector {
+                compatible = "usb-c-connector";
+                label = "USB-C";
+                power-role = "dual";
+                data-role = "dual";
+                self-powered;
+                ports {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+                        port@0 {
+                                reg = <0>;
+                                hs_ep: endpoint {
+                                        remote-endpoint = <&usb3_hs_ep>;
+                                };
+                        };
+                        port@1 {
+                                reg = <1>;
+                                ss_ep: endpoint {
+                                        remote-endpoint = <&pi5usb30213a_in_ep>;
+                                };
+                        };
+                };
+        };
 };
 
 &eqos {
@@ -291,9 +314,20 @@
 //      role-switch-default-mode = "none";
         status = "okay";
 
-        port {
-                usb3_role_switch: endpoint {
-                        remote-endpoint = <&pi5usb30213a_ep>;
+        ports {
+                #address-cells = <1>;
+                #size-cells = <0>;
+                port@0 {
+                        reg = <0>;
+                        usb3_hs_ep: endpoint {
+                                remote-endpoint = <&hs_ep>;
+                        };
+                };
+                port@1 {
+                        reg = <1>;
+                        usb3_role_switch: endpoint {
+                                remote-endpoint = <&pi5usb30213a_out_ep>;
+                        };
                 };
         };
 };
@@ -506,22 +540,19 @@
                 reg = <0x0d>;
                 interrupt-parent = <&gpio2>;
                 interrupts = <11 IRQ_TYPE_LEVEL_LOW>;
-
-                connector {
-                        compatible = "usb-c-connector";
-                        label = "USB-C";
-                        power-role = "dual";
-                        data-role = "dual";
-                        self-powered;
-                        ports {
-                                #address-cells = <1>;
-                                #size-cells = <0>;
-
-                                port@1 {
-                                        reg = <1>;
-                                        pi5usb30213a_ep: endpoint {
-                                                remote-endpoint = <&usb3_role_switch>;
-                                        };
+                ports {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+                        port@0 {
+                                reg = <0>;
+                                pi5usb30213a_in_ep: endpoint {
+                                        remote-endpoint = <&ss_ep>;
+                                };
+                        };
+                        port@1 {
+                                reg = <1>;
+                                pi5usb30213a_out_ep: endpoint {
+                                        remote-endpoint = <&usb3_role_switch>;
                                 };
                         };
                 };
