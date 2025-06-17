@@ -1,0 +1,80 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/*
+ * Copyright 2025 SomLabs
+ *
+ */
+
+/ {
+    /delete-node/ panel-backlight;
+
+    dp_connector {
+        compatible = "dp-connector";
+        label = "DisplayPort";
+        type = "full-size";
+
+        port {
+            display_port_con_in: endpoint {
+                remote-endpoint = <&edp_bridge_out>;
+            };
+        };
+    };
+
+    edp_bridge_refclk: edp-bridge-refclk {
+        compatible = "fixed-clock";
+        #clock-cells = <0>;
+        clock-frequency = <27000000>;
+    };
+
+};
+
+&pwm2 {
+    status = "disabled";
+};
+
+&i2c2 {
+    /delete-node/ edt-ft5x06@38;
+
+    /* MIPI-DSI to HDMI adapter */
+    edp_bridge: bridge@2d {
+        compatible = "ti,sn65dsi86";
+        reg = <0x2d>;
+        pinctrl-names = "default";
+
+        clock-names = "refclk";
+        clocks = <&edp_bridge_refclk>;
+
+        no-hpd; /* HPD routed to processor GPIO! */
+
+        ports {
+            #address-cells = <1>;
+            #size-cells = <0>;
+            port@0 {
+                reg = <0>;
+                edp_bridge_in: endpoint {
+                    remote-endpoint = <&mipi_dsi_out>;
+                };
+            };
+            port@1 {
+                reg = <1>;
+                edp_bridge_out: endpoint {
+                    data-lanes = <3 2 1 0>;
+                    lane-polarities = <1 1 1 1>;
+                    remote-endpoint = <&display_port_con_in>;
+                };
+            };
+        };
+    };
+};
+
+&mipi_dsi {
+    status = "okay";
+
+    /delete-node/ panel@0;
+
+    port@1 {
+        mipi_dsi_out: endpoint {
+            remote-endpoint = <&edp_bridge_in>;
+            attach-bridge;
+        };
+    };
+};

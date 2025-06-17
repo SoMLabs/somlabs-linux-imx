@@ -151,12 +151,14 @@ dtb-$(CONFIG_ARCH_MXC) += visionsom-8mm-cb-std.dtb \
 			  visionsom-8mm-cb-std-mipi7-rvt70hsmnwc00.dtb \
 			  visionsom-8mm-cb-std-mipi10.dtb \
 			  visionsom-8mm-cb-std-hdmi.dtb \
+			  visionsom-8mm-cb-std-dp.dtb \
 			  visionsom-8mm-cb-std-lvds-rvt70hslnwc00-b.dtb \
 			  visionsom-8mm-cb-adv.dtb \
 			  visionsom-8mm-cb-adv-mipi7-ph720128t003.dtb \
 			  visionsom-8mm-cb-adv-mipi7-rvt70hsmnwc00.dtb \
 			  visionsom-8mm-cb-adv-mipi10.dtb \
 			  visionsom-8mm-cb-adv-hdmi.dtb \
+			  visionsom-8mm-cb-adv-dp.dtb \
 			  visionsom-8mm-cb-adv-lvds-rvt70hslnwc00-b.dtb \
 			  titansbc-8mmini.dtb
 
