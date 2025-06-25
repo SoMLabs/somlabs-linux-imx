@@ -62,6 +62,7 @@
 #define SN_LN_ASSIGN_REG			0x59
 #define  LN_ASSIGN_WIDTH			2
 #define SN_ENH_FRAME_REG			0x5A
+#define  ASSR_CONTROL				GENMASK(1, 0)
 #define  VSTREAM_ENABLE				BIT(3)
 #define  LN_POLRS_OFFSET			4
 #define  LN_POLRS_MASK				0xf0
@@ -121,6 +122,9 @@
 #define SN_IRQ_STATUS_REG			0xF5
 #define  HPD_REMOVAL_STATUS			BIT(2)
 #define  HPD_INSERTION_STATUS			BIT(1)
+
+#define SN_PAGE_SEL_REG				0xFF
+#define SN_ASSR_OVERRIDE_REG			0x16
 
 #define MIN_DSI_CLK_FREQ_MHZ	40
 
@@ -217,6 +221,7 @@ struct ti_sn65dsi86 {
 	atomic_t			pwm_pin_busy;
 #endif
 	unsigned int			pwm_refclk_freq;
+	bool				disable_assr;
 };
 
 static const struct regmap_range ti_sn65dsi86_volatile_ranges[] = {
@@ -1059,6 +1064,15 @@ static int ti_sn_link_training(struct ti_sn65dsi86 *pdata, int dp_rate_idx,
 		goto exit;
 	}
 
+	regmap_update_bits(pdata->regmap, 0xB0, 0xF0, 10 << 4);
+	regmap_update_bits(pdata->regmap, 0xB1, 0xF0, 10 << 4);
+
+	regmap_update_bits(pdata->regmap, 0xB4, 0xF0, 10 << 4);
+	regmap_update_bits(pdata->regmap, 0xB5, 0xF0, 10 << 4);
+
+	regmap_update_bits(pdata->regmap, 0xB8, 0xF0, 10 << 4);
+	regmap_update_bits(pdata->regmap, 0xB9, 0xF0, 10 << 4);
+
 	/*
 	 * We'll try to link train several times.  As part of link training
 	 * the bridge chip will write DP_SET_POWER_D0 to DP_SET_POWER.  If
@@ -1067,6 +1081,7 @@ static int ti_sn_link_training(struct ti_sn65dsi86 *pdata, int dp_rate_idx,
 	 */
 	for (i = 0; i < SN_LINK_TRAINING_TRIES; i++) {
 		/* Semi auto link training mode */
+		regmap_write(pdata->regmap, SN_ML_TX_MODE_REG, 0x02);
 		regmap_write(pdata->regmap, SN_ML_TX_MODE_REG, 0x0A);
 		ret = regmap_read_poll_timeout(pdata->regmap, SN_ML_TX_MODE_REG, val,
 					       val == ML_TX_MAIN_LINK_OFF ||
@@ -1140,9 +1155,16 @@ static void ti_sn_bridge_atomic_enable(struct drm_bridge *bridge,
 	 * we need to disable the scrambler.
 	 */
 	if (pdata->bridge.type == DRM_MODE_CONNECTOR_eDP) {
-		drm_dp_dpcd_writeb(&pdata->aux, DP_EDP_CONFIGURATION_SET,
-				   DP_ALTERNATE_SCRAMBLER_RESET_ENABLE);
-
+		if(pdata->disable_assr) {
+			regmap_write(pdata->regmap, SN_PAGE_SEL_REG, 7);
+			regmap_write(pdata->regmap, SN_ASSR_OVERRIDE_REG, 1);
+			regmap_write(pdata->regmap, SN_PAGE_SEL_REG, 0);
+			regmap_update_bits(pdata->regmap, SN_ENH_FRAME_REG,
+					   ASSR_CONTROL, 0);
+		} else {
+			drm_dp_dpcd_writeb(&pdata->aux, DP_EDP_CONFIGURATION_SET,
+					   DP_ALTERNATE_SCRAMBLER_RESET_ENABLE);
+		}
 		regmap_update_bits(pdata->regmap, SN_TRAINING_SETTING_REG,
 				   SCRAMBLE_DISABLE, 0);
 	} else {
@@ -2054,6 +2076,10 @@ static int ti_sn65dsi86_probe(struct i2c_client *client)
 	if (IS_ERR(pdata->refclk))
 		return dev_err_probe(dev, PTR_ERR(pdata->refclk),
 				     "failed to get reference clock\n");
+
+	pdata->disable_assr = of_property_read_bool(dev->of_node, "disable-assr");
+	if(pdata->disable_assr)
+		dev_warn(dev, "ASSR disabled\n");
 
 	pm_runtime_enable(dev);
 	pm_runtime_set_autosuspend_delay(pdata->dev, 500);
