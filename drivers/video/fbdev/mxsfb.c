@@ -62,6 +62,7 @@
 #include <video/of_display_timing.h>
 #include <video/videomode.h>
 #include <linux/uaccess.h>
+#include <linux/backlight.h>
 
 #include "mxc/mxc_dispdrv.h"
 

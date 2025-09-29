@@ -223,7 +223,7 @@
 
                 pinctrl_usb_otg1_id: usbotg1idgrp {
                         fsl,pins = <
-                                MX6UL_PAD_UART3_TX_DATA__GPIO1_IO24
+                                MX6UL_PAD_GPIO1_IO00__ANATOP_OTG1_ID 0x17059
                         >;
                 };
 
