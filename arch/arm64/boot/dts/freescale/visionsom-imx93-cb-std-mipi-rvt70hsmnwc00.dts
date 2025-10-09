@@ -1,15 +1,17 @@
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright 2020 SomLabs
+ * Copyright 2024 SomLabs
  *
  */
 
-#include "visionsom-imx93-cb-std.dtsi"
+#include <dt-bindings/pwm/pwm.h>
+
+#include "visionsom-imx93-cb-std.dts"
 
 / {
 	model = "SoMLabs VisionSOM-IMX93 CB-STD/MIPI7-RVT70HSMNWC00";
 
-        dsi_panel_backlight: panel-backlight {
+	dsi_panel_backlight: panel-backlight {
 		compatible = "pwm-backlight";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_panel_backlight_en>;
@@ -21,7 +23,7 @@
 		enable-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
 
 		status = "okay";
-        };
+	};
 };
 
 &tpm1 {

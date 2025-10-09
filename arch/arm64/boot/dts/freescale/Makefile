@@ -448,6 +448,7 @@ dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk-pmic-pf0900-mt9m114.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk-pmic-pf0900-ld.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk-pmic-pf0900-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += imx93-11x11-evk-pmic-pf0900-rpmsg-lpv.dtb
+dtb-$(CONFIG_ARCH_MXC) += visionsom-imx91-cb-std.dtb
 dtb-$(CONFIG_ARCH_MXC) += visionsom-imx93-cb-std.dtb
 dtb-$(CONFIG_ARCH_MXC) += visionsom-imx93-cb-std-lvds-rvt70hslnwc00-b.dtb
 dtb-$(CONFIG_ARCH_MXC) += visionsom-imx93-cb-std-mipi-rvt70hsmnwc00.dtb
