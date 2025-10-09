@@ -1,0 +1,50 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2025 SomLabs
+ */
+
+/dts-v1/;
+
+#include "visionsom-imx91.dtsi"
+
+#include "visionsom-imx9x-cb-std.dtsi"
+
+/ {
+	model = "SoMLabs VisionSOM-IMX91 CB-STD";
+
+	sound {
+		simple-audio-card,codec {
+			clocks = <&clk IMX91_CLK_SAI1>;
+		};
+	};
+
+};
+
+&iomuxc {
+	pinctrl_usb_otg1: usbotg1grp {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO22__GPIO2_IO22			0x31e	/* USB1 VBUS EN */
+			MX91_PAD_SD2_RESET_B__GPIO3_IO7	        	0x31e	/* USB1 VBUS OC */
+		>;
+	};
+
+	pinctrl_usb_otg2: usbotg2grp {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO23__GPIO2_IO23			0x31e	/* USB2 VBUS EN */
+			MX91_PAD_SD2_CD_B__GPIO3_IO0			0x31e	/* USB2 VBUS OC */
+		>;
+	};
+
+	pinctrl_camera: cameragrp {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO19__GPIO2_IO19			0x31e	/* PW EN */
+			MX91_PAD_GPIO_IO18__GPIO2_IO18			0x31e	/* RESET */
+		>;
+	};
+
+	pinctrl_gpioexp: gpioexp {
+		fsl,pins = <
+			MX91_PAD_GPIO_IO27__GPIO2_IO27			0x31e	/* GPIO2_IO27 interrupt */
+		>;
+	};
+};

@@ -1,14 +1,9 @@
 
-// SPDX-License-Identifier: GPL-2.0-or-later
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
  * Copyright 2024 SomLabs
  *
  */
-
-/dts-v1/;
-
-#include "visionsom-imx93.dtsi"
-#include <dt-bindings/pwm/pwm.h>
 
 / {
 	leds {
@@ -115,14 +110,8 @@
 
 		simple-audio-card,codec {
 			sound-dai = <&codec_nau8822>;
-			clocks = <&clk IMX93_CLK_SAI1>;
+			// clocks = <&clk IMX93_CLK_SAI1>;
 		};
-	};
-
-	clk_ext_camera: clk_ext_camera {
-		compatible = "fixed-clock";
-		#clock-cells = <0>;
-		clock-frequency = <24000000>;
 	};
 };
 
@@ -219,30 +208,6 @@
 	status = "okay";
 };
 
-&lpi2c1 {
-
-	ov5640: camera@3c {
-		compatible = "ovti,ov5640";
-		reg = <0x3c>;
-		clock-names = "xclk";
-		clocks = <&clk_ext_camera>;
-                pinctrl-names = "default";
-                pinctrl-0 = <&pinctrl_camera>;
-		reset-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;	// MX93_PAD_GPIO_IO18__GPIO2_IO18
-		powerdown-gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>;	// MX93_PAD_GPIO_IO19__GPIO2_IO19
-
-		status = "okay";
-
-		port {
-			ov5640_mipi_ep: endpoint {
-				clock-lanes = <0>;
-				data-lanes = <1 2>;
-				remote-endpoint = <&mipi_csi_ep>;
-			};
-		};
-	};
-};
-
 &lpi2c8 {
 	status = "okay";
 
@@ -280,77 +245,8 @@
 };
 
 &lpuart5 {
-        pinctrl-names = "default";
-        pinctrl-0 = <&pinctrl_uart5>;
-        linux,rs485-enabled-at-boot-time;
-        status = "okay";
-};
-
-&isi {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart5>;
+	linux,rs485-enabled-at-boot-time;
 	status = "okay";
-
-        port {
-                isi_in: endpoint {
-                        remote-endpoint = <&mipi_csi_out>;
-                };
-        };
-};
-
-&mipi_csi {
-	status = "okay";
-
-        ports {
-                #address-cells = <1>;
-                #size-cells = <0>;
-
-                port@0{
-                        mipi_csi_ep: endpoint {
-                                remote-endpoint = <&ov5640_mipi_ep>;
-                                cfg-clk-range = <28>;
-                                hs-clk-range = <0x7>;
-                                data-lanes = <1 2>;
-                        };
-                };
-
-                port@1 {
-                        reg = <1>;
-
-                        mipi_csi_out: endpoint {
-                                remote-endpoint = <&isi_in>;
-                        };
-                };
-        };
-};
-
-&dphy_rx {
-        status = "okay";
-};
-
-&iomuxc {
-	pinctrl_usb_otg1: usbotg1grp {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO22__GPIO2_IO22			0x31e	/* USB1 VBUS EN */
-			MX93_PAD_SD2_RESET_B__GPIO3_IO07		0x31e	/* USB1 VBUS OC */
-		>;
-	};
-
-	pinctrl_usb_otg2: usbotg2grp {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO23__GPIO2_IO23			0x31e	/* USB2 VBUS EN */
-			MX93_PAD_SD2_CD_B__GPIO3_IO00			0x31e	/* USB2 VBUS OC */
-		>;
-	};
-
-	pinctrl_camera: cameragrp {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO19__GPIO2_IO19			0x31e	/* PW EN */
-			MX93_PAD_GPIO_IO18__GPIO2_IO18			0x31e	/* RESET */
-		>;
-	};
-
-	pinctrl_gpioexp: gpioexp {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO27__GPIO2_IO27			0x31e	/* GPIO2_IO27 interrupt */
-		>;
-	};
 };
