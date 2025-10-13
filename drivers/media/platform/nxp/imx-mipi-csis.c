@@ -22,6 +22,7 @@
 #include <linux/module.h>
 #include <linux/mutex.h>
 #include <linux/of.h>
+#include <linux/of_graph.h>
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
 #include <linux/regulator/consumer.h>
@@ -330,6 +331,8 @@ struct mipi_csis_device {
 	u32 clk_frequency;
 	u32 hs_settle;
 	u32 clk_settle;
+	u8 swap_clk;
+	u8 swap_data;
 
 	spinlock_t slock;	/* Protect events */
 	struct mipi_csis_event events[MIPI_CSIS_NUM_EVENTS];
@@ -650,6 +653,21 @@ static int mipi_csis_calculate_params(struct mipi_csis_device *csis,
 	return 0;
 }
 
+static void mipi_csis_set_set_data_clock_polarity(struct mipi_csis_device *csis)
+{
+        u32 val = mipi_csis_read(csis, MIPI_CSIS_DPHY_CMN_CTRL);
+
+        val &= ~(MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_CLK | MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_DAT);
+
+        if(csis->swap_clk)
+                val |= MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_CLK;
+
+        if(csis->swap_data)
+                val |= MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_DAT;
+
+        mipi_csis_write(csis, MIPI_CSIS_DPHY_CMN_CTRL, val);
+}
+
 static void mipi_csis_set_params(struct mipi_csis_device *csis,
 				 const struct v4l2_mbus_framefmt *format,
 				 const struct csis_pix_format *csis_fmt)
@@ -669,6 +687,8 @@ static void mipi_csis_set_params(struct mipi_csis_device *csis,
 	mipi_csis_write(csis, MIPI_CSIS_DPHY_CMN_CTRL,
 			MIPI_CSIS_DPHY_CMN_CTRL_HSSETTLE(csis->hs_settle) |
 			MIPI_CSIS_DPHY_CMN_CTRL_CLKSETTLE(csis->clk_settle));
+
+	mipi_csis_set_set_data_clock_polarity(csis);
 
 	val = (0 << MIPI_CSIS_ISP_SYNC_HSYNC_LINTV_OFFSET)
 	    | (0 << MIPI_CSIS_ISP_SYNC_VSYNC_SINTV_OFFSET)
@@ -1439,6 +1459,19 @@ static int mipi_csis_parse_dt(struct mipi_csis_device *csis)
 	if (of_property_read_u32(node, "clock-frequency",
 				 &csis->clk_frequency))
 		csis->clk_frequency = DEFAULT_SCLK_CSIS_FREQ;
+
+	node = of_graph_get_next_endpoint(node, NULL);
+	if (!node) {
+		dev_err(csis->dev, "No port node at %s\n",
+			csis->dev->of_node->full_name);
+		return -EINVAL;
+	}
+
+	csis->swap_data = of_property_read_bool(node,
+						"swap-data");
+
+	csis->swap_clk = of_property_read_bool(node,
+						"swap-clk");
 
 	return 0;
 }
