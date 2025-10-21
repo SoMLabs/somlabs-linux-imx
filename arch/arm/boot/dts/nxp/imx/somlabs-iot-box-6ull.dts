@@ -73,6 +73,13 @@
                         regulator-max-microvolt = <3300000>;
                 };
         };
+
+        wlan_pwrseq: wlanpwrseq {
+                compatible = "mmc-pwrseq-simple";
+                pinctrl-names = "default";
+                pinctrl-0 = <&pinctrl_wlan_en>;
+                reset-gpios = <&gpio1 5 GPIO_ACTIVE_LOW>;
+        };
 };
 
 &can1 {
@@ -139,7 +146,6 @@
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_uart5>;
         linux,rs485-enabled-at-boot-time;
-        //rs485-rx-during-tx;
         rts-gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;
         status = "okay";
 };
@@ -171,6 +177,27 @@
 
 &usbphy2 {
         tx-d-cal = <0x5>;
+};
+
+&usdhc1 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        pinctrl-names = "default", "state_100mhz", "state_200mhz";
+        pinctrl-0 = <&pinctrl_usdhc1>;
+        pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
+        pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
+        bus-width = <4>;
+        pm-ignore-notify;
+        keep-power-in-suspend;
+        non-removable;
+        status = "okay";
+        cap-power-off-card;
+        mmc-pwrseq = <&wlan_pwrseq>;
+
+        brcmf: bcrmf@1 {
+                reg = <1>;
+                compatible = "brcm,bcm4329-fmac";
+        };
 };
 
 &iomuxc {
@@ -212,7 +239,7 @@
 
                                 // Digital outputs
                                 MX6UL_PAD_JTAG_TDO__GPIO1_IO12    0x17099
-                                MX6UL_PAD_JTAG_TCK__GPIO1_IO14    0x17099
+                                MX6UL_PAD_UART1_RTS_B__GPIO1_IO19 0x17099
                                 MX6UL_PAD_UART2_CTS_B__GPIO1_IO22 0x17099
                                 MX6UL_PAD_UART3_CTS_B__GPIO1_IO26 0x17099
 
@@ -279,6 +306,48 @@
                 pinctrl_usb_otg1_id: usbotg1idgrp {
                         fsl,pins = <
                                 MX6UL_PAD_UART3_TX_DATA__ANATOP_OTG1_ID 0x17059
+                        >;
+                };
+
+                pinctrl_usdhc1: usdhc1grp {
+                        fsl,pins = <
+                                MX6UL_PAD_SD1_CMD__USDHC1_CMD      0x17059
+                                MX6UL_PAD_SD1_CLK__USDHC1_CLK      0x10071
+                                MX6UL_PAD_SD1_DATA0__USDHC1_DATA0  0x17059
+                                MX6UL_PAD_SD1_DATA1__USDHC1_DATA1  0x17059
+                                MX6UL_PAD_SD1_DATA2__USDHC1_DATA2  0x17059
+                                MX6UL_PAD_SD1_DATA3__USDHC1_DATA3  0x17059
+                                MX6UL_PAD_JTAG_TCK__OSC32K_32K_OUT 0x17099
+                        >;
+                };
+
+                pinctrl_usdhc1_100mhz: usdhc1grp_100mhz {
+                        fsl,pins = <
+                                MX6UL_PAD_SD1_CMD__USDHC1_CMD      0x17069
+                                MX6UL_PAD_SD1_CLK__USDHC1_CLK      0x10069
+                                MX6UL_PAD_SD1_DATA0__USDHC1_DATA0  0x17069
+                                MX6UL_PAD_SD1_DATA1__USDHC1_DATA1  0x17069
+                                MX6UL_PAD_SD1_DATA2__USDHC1_DATA2  0x17069
+                                MX6UL_PAD_SD1_DATA3__USDHC1_DATA3  0x17069
+                                MX6UL_PAD_JTAG_TCK__OSC32K_32K_OUT 0x17099
+                        >;
+                };
+
+                pinctrl_usdhc1_200mhz: usdhc1grp_200mhz {
+                        fsl,pins = <
+                                MX6UL_PAD_SD1_CMD__USDHC1_CMD      0x170f9
+                                MX6UL_PAD_SD1_CLK__USDHC1_CLK      0x100f9
+                                MX6UL_PAD_SD1_DATA0__USDHC1_DATA0  0x170f9
+                                MX6UL_PAD_SD1_DATA1__USDHC1_DATA1  0x170f9
+                                MX6UL_PAD_SD1_DATA2__USDHC1_DATA2  0x170f9
+                                MX6UL_PAD_SD1_DATA3__USDHC1_DATA3  0x170f9
+                                MX6UL_PAD_JTAG_TCK__OSC32K_32K_OUT 0x17099
+                        >;
+                };
+
+                pinctrl_wlan_en: wlanengrp {
+                        fsl,pins = <
+                                MX6UL_PAD_GPIO1_IO05__GPIO1_IO05 0x17059
                         >;
                 };
         };
