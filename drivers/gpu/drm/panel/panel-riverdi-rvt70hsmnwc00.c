@@ -26,9 +26,9 @@ struct rvt70hsmnwc00 {
 static const struct drm_display_mode rvt70hsmnwc00_default_mode = {
         .clock       = 51000,
         .hdisplay    = 1024,
-        .hsync_start = 1024 + 60,
-        .hsync_end   = 1024 + 60 + 80,
-        .htotal      = 1024 + 60 + 80 + 160,
+        .hsync_start = 1024 + 200,
+        .hsync_end   = 1024 + 200 + 80,
+        .htotal      = 1024 + 200 + 80 + 160,
         .vdisplay    = 600,
         .vsync_start = 600 + 12,
         .vsync_end   = 600 + 12 + 10,
