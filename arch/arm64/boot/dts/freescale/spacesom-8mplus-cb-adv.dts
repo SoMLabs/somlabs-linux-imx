@@ -587,12 +587,8 @@
                 assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
                 assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
                 assigned-clock-rates = <24000000>;
-                csi_id = <0>;
                 reset-gpios = <&gpio1 0 GPIO_ACTIVE_LOW>;
                 powerdown-gpios = <&gpio1 3 GPIO_ACTIVE_HIGH>;
-                mclk = <24000000>;
-                mclk_source = <0>;
-                mipi_csi;
                 status = "okay";
 
                 port {
@@ -641,13 +637,9 @@
                 assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
                 assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
                 assigned-clock-rates = <24000000>;
-                csi_id = <1>;
                 reset-gpios = <&gpio5 22 GPIO_ACTIVE_LOW>;
                 powerdown-gpios = <&gpio5 23 GPIO_ACTIVE_HIGH>;
-                mclk = <24000000>;
-                mclk_source = <0>;
-                mipi_csi;
-                status = "okay";
+                status = "disabled";
 
                 port {
                         ov5640_mipi_1_ep: endpoint {
@@ -731,7 +723,7 @@
 &mipi_csi_1 {
         #address-cells = <1>;
         #size-cells = <0>;
-        status = "okay";
+        status = "disabled";
 
         port@1 {
                 reg = <1>;
@@ -764,7 +756,7 @@
 };
 
 &isi_1 {
-        status = "okay";
+        status = "disabled";
 
         cap_device {
                 status = "okay";
