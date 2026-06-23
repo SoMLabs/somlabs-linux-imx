@@ -329,6 +329,8 @@ struct sec_mipi_dsim {
 	struct completion pl_tx_done;
 	struct completion rx_done;
 	const struct sec_mipi_dsim_plat_data *pdata;
+	bool swap_dn_dp_clk;
+	bool swap_dn_dp_data;
 };
 
 #define DSIM_HBLANK_PARAM(nm, vf, hfp, hbp, hsa, num)	\
@@ -487,6 +489,26 @@ static int sec_mipi_dsim_host_attach(struct mipi_dsi_host *host,
 		}
 
 		dsim->panel = panel;
+
+		/* check if clk/data lanes polarity swap is requested */
+		u32 lane_polarities[5] = { 0 };
+		int i, nr_lanes;
+		nr_lanes = of_property_count_u32_elems(dsi->dev.of_node, "data-lanes");
+		if (nr_lanes > 0 && nr_lanes <= 4) {
+			/* Polarity 0 is clock lane, 1..4 are data lanes. */
+			of_property_read_u32_array(dsi->dev.of_node, "lane-polarities",
+						lane_polarities, nr_lanes + 1);
+			for (i = 1; i <= nr_lanes; i++) {
+				if (lane_polarities[1] != lane_polarities[i])
+					dev_err(dev, "Data lanes polarities do not match\n");
+			}
+			if (lane_polarities[0])
+				dsim->swap_dn_dp_clk = true;
+			if (lane_polarities[1])
+				dsim->swap_dn_dp_data = true;
+		}
+		if(dsim->swap_dn_dp_clk || dsim->swap_dn_dp_data)
+			dev_info(dev, "CLK polarity swap: %u, DATA polarity swap: %u\n", dsim->swap_dn_dp_clk, dsim->swap_dn_dp_data);
 	}
 
 	/* TODO: DSIM 3 lanes has some display issue, so
@@ -844,6 +866,12 @@ static int sec_mipi_dsim_config_pll(struct sec_mipi_dsim *dsim)
 	/* TODO: config dp/dn swap if requires */
 
 	pllctrl |= PLLCTRL_SET_PMS(dsim->pms) | PLLCTRL_PLLEN;
+
+	if (dsim->swap_dn_dp_clk)
+		pllctrl |= PLLCTRL_DPDNSWAP_CLK;
+	if (dsim->swap_dn_dp_data)
+		pllctrl |= PLLCTRL_DPDNSWAP_DAT;
+
 	dsim_write(dsim, pllctrl, DSIM_PLLCTRL);
 
 	ret = wait_for_completion_timeout(&dsim->pll_stable, HZ / 10);
