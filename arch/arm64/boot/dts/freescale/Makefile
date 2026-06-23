@@ -150,6 +150,7 @@ dtb-$(CONFIG_ARCH_MXC) += visionsom-8mm-cb-std.dtb \
 			  titansbc-8mmini.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += spacesom-8mplus-cb-adv.dtb \
+			  starsom-8mp-cb-adv.dtb \
 			  somlabs-aiot-box-8mplus.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += imx8mm-evk-ak4497.dtb imx8mm-evk-ak5558.dtb imx8mm-evk-audio-tdm.dtb
