@@ -63,6 +63,14 @@
 	};
 };
 
+&dphy {
+        status = "okay";
+};
+
+&dphy_rx {
+        status = "okay";
+};
+
 &lpi2c1 {
 	ili2132a_touch: ili2132a@41 {
 		compatible = "ilitek,ili2132";
@@ -74,10 +82,6 @@
 		reset-gpios = <&gpio2 8 GPIO_ACTIVE_LOW>;
 		status = "okay";
 	};
-};
-
-&epxp {
-	status = "okay";
 };
 
 &iomuxc {

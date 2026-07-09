@@ -72,13 +72,6 @@
         };
 };
 
-&adc1 {
-        pinctrl-names = "default";
-        pinctrl-0 = <&pinctrl_adc1>;
-        vref-supply = <&reg_3v3>;
-        status = "okay";
-};
-
 &can1 {
         pinctrl-names = "default";
         pinctrl-0 = <&pinctrl_flexcan1>;
@@ -111,12 +104,6 @@
 &iomuxc {
         pinctrl-0 = <&pinctrl_hog_1>;
         starsom-cb-6ull {
-                pinctrl_adc1: adc1grp {
-                        fsl,pins = <
-                                MX6UL_PAD_GPIO1_IO00__GPIO1_IO00        0xb0
-                        >;
-                };
-
                 pinctrl_ecspi3: ecspi3grp {
                         fsl,pins = <
                                 MX6UL_PAD_UART2_RTS_B__ECSPI3_MISO      0x1b0b1

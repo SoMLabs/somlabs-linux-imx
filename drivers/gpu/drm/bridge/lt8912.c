@@ -456,7 +456,7 @@ static int lt8912_connector_get_modes(struct drm_connector *connector)
 }
 
 static enum drm_mode_status lt8912_connector_mode_valid(struct drm_connector *connector,
-			     struct drm_display_mode *mode)
+			     const struct drm_display_mode *mode)
 {
 	if (mode->clock > 150000)
 		return MODE_CLOCK_HIGH;
@@ -479,10 +479,7 @@ static const struct drm_connector_helper_funcs lt8912_connector_helper_funcs = {
 static void lt8912_bridge_disable(struct drm_bridge *bridge)
 {
 	struct lt8912 *lt = bridge_to_lt8912(bridge);
-	int ret = drm_panel_disable(lt->lvds_panel);
-
-	if (ret < 0)
-		dev_err(lt->dev, "error disabling panel (%d)\n", ret);
+	drm_panel_disable(lt->lvds_panel);
 }
 
 static void lt8912_bridge_post_disable(struct drm_bridge *bridge)
@@ -559,7 +556,8 @@ static int lt8912_get_hpd_gpio(struct device *dev, struct lt8912 *lt)
         return ret;
 }
 
-static int lt8912_bridge_attach(struct drm_bridge *bridge, enum drm_bridge_attach_flags flags)
+static int lt8912_bridge_attach(struct drm_bridge *bridge, struct drm_encoder *encoder,
+		                enum drm_bridge_attach_flags flags)
 {
 	struct lt8912 *lt = bridge_to_lt8912(bridge);
 	struct drm_connector *connector = &lt->connector;
@@ -725,12 +723,6 @@ err_dsi_device:
 	return ret;
 }
 
-void lt8912_detach_dsi(struct lt8912 *lt)
-{
-	mipi_dsi_detach(lt->dsi);
-	mipi_dsi_device_unregister(lt->dsi);
-}
-
 static int lt8912_probe(struct i2c_client *i2c)
 {
 	struct device *dev = &i2c->dev;
@@ -738,7 +730,8 @@ static int lt8912_probe(struct i2c_client *i2c)
 	struct device_node *ddc_phandle;
 	int ret;
 
-	lt = devm_kzalloc(dev, sizeof(*lt), GFP_KERNEL);
+        lt = devm_drm_bridge_alloc(dev, struct lt8912, bridge,
+                                   &lt8912_bridge_funcs);
 	if (!lt)
 		return -ENOMEM;
 
@@ -778,7 +771,6 @@ static int lt8912_probe(struct i2c_client *i2c)
 	}
 	of_node_put(lt->mipi_host);
 
-	lt->bridge.funcs = &lt8912_bridge_funcs;
 	lt->bridge.of_node = dev->of_node;
 
 	drm_bridge_add(&lt->bridge);

@@ -12,17 +12,6 @@
     model = "SoMLabs VisionSOM i.MX8MM";
     compatible = "somlabs,visionsom-imx8mm", "fsl,imx8mm";
 
-    reserved-memory {
-        #address-cells = <2>;
-        #size-cells = <2>;
-        ranges;
-
-        rpmsg_reserved: rpmsg@b8000000 {
-            no-map;
-            reg = <0 0xb8000000 0 0x400000>;
-        };
-    };
-
     chosen {
         bootargs = "console=ttymxc3,115200 earlycon=ec_imx6q,0x30a60000,115200";
         stdout-path = &uart4;
@@ -236,7 +225,6 @@
     pmic: pca9450@25 {
         reg = <0x25>;
         compatible = "nxp,pca9450a";
-        /* PMIC PCA9450 PMIC_nINT GPIO1_IO1 */
         pinctrl-0 = <&pinctrl_pmic>;
         pinctrl-names = "default";
         interrupt-parent = <&gpio1>;
@@ -336,10 +324,6 @@
     };
 };
 
-&mu {
-    status = "okay";
-};
-
 &uart1 { /* BT */
     pinctrl-names = "default";
     pinctrl-0 = <&pinctrl_uart1_bt>;
@@ -434,18 +418,15 @@
     cpu-supply = <&buck2_reg>;
 };
 
-&gpu {
-    status = "okay";
+&pgc_gpu {
+        assigned-clocks = <&clk IMX8MM_CLK_GPU_AXI>,
+                         <&clk IMX8MM_CLK_GPU_AHB>;
+        assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_800M>,
+                                 <&clk IMX8MM_SYS_PLL1_800M>;
+        assigned-clock-rates = <800000000>, <400000000>;
+        /delete-property/ power-domains;
 };
 
-&vpu_g1 {
-    status = "okay";
-};
-
-&vpu_g2 {
-    status = "okay";
-};
-
-&vpu_h1 {
-    status = "okay";
+&pgc_gpumix {
+        status = "disabled";
 };

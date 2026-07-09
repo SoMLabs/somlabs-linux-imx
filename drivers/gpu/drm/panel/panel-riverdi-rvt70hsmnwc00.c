@@ -24,7 +24,7 @@ struct rvt70hsmnwc00 {
 };
 
 static const struct drm_display_mode rvt70hsmnwc00_default_mode = {
-        .clock       = 51000,
+        .clock       = 50000,
         .hdisplay    = 1024,
         .hsync_start = 1024 + 200,
         .hsync_end   = 1024 + 200 + 80,
@@ -210,9 +210,12 @@ static int rvt70hsmnwc00_probe(struct mipi_dsi_device *dsi)
 	struct rvt70hsmnwc00 *ctx;
 	int ret;
 
-	ctx = devm_kzalloc(dev, sizeof(*ctx), GFP_KERNEL);
-	if (!ctx)
-		return -ENOMEM;
+	ctx = devm_drm_panel_alloc(dev, struct rvt70hsmnwc00, panel,
+				   &rvt70hsmnwc00_drm_funcs,
+                                   DRM_MODE_CONNECTOR_DSI);
+
+	if (IS_ERR(ctx))
+		return PTR_ERR(ctx);
 
 
 	ctx->reset_gpio = devm_gpiod_get(dev, "reset", GPIOD_OUT_HIGH);
@@ -229,9 +232,6 @@ static int rvt70hsmnwc00_probe(struct mipi_dsi_device *dsi)
 	dsi->lanes = 4;
 	dsi->format = MIPI_DSI_FMT_RGB888;
 	dsi->mode_flags = MIPI_DSI_MODE_VIDEO | MIPI_DSI_MODE_LPM | MIPI_DSI_MODE_VIDEO_BURST;
-
-	drm_panel_init(&ctx->panel, dev, &rvt70hsmnwc00_drm_funcs,
-		       DRM_MODE_CONNECTOR_DSI);
 
 	ret = drm_panel_of_backlight(&ctx->panel);
 	if (ret)

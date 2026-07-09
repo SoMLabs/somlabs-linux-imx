@@ -1414,11 +1414,7 @@ static void sec_mipi_dsim_bridge_atomic_enable(struct drm_bridge *bridge,
 
 	/* enable panel if exists */
 	if (dsim->panel) {
-		ret = drm_panel_enable(dsim->panel);
-		if (unlikely(ret)) {
-			dev_err(dsim->dev, "panel enable failed: %d\n", ret);
-			goto panel_unprepare;
-		}
+		drm_panel_enable(dsim->panel);
 	}
 
 	/* enable data transfer of dsim */

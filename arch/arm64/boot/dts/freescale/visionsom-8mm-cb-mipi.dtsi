@@ -4,6 +4,8 @@
  *
  */
 
+#include "imx8mm-nxp-display.dtsi"
+
 / {
 
     panel_backlight: panel-backlight {
@@ -57,4 +59,8 @@
     pinctrl-names = "default";
     pinctrl-0 = <&pinctrl_panel_backlight_pwm>;
     status = "okay";
+};
+
+&lcdif {
+       status = "okay";
 };

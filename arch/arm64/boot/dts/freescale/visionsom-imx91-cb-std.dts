@@ -14,7 +14,7 @@
 
 	sound {
 		simple-audio-card,codec {
-			clocks = <&clk IMX91_CLK_SAI1>;
+			clocks = <&clk IMX93_CLK_SAI1>;
 		};
 	};
 

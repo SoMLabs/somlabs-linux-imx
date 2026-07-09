@@ -266,10 +266,3 @@
     status = "okay";
 };
 
-&lcdif {
-    status = "okay";
-};
-
-&mipi_dsi {
-    status = "okay";
-};

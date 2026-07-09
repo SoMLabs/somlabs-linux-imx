@@ -80,3 +80,7 @@
         "rxtx4", "rxtx5", "rxtx6", "rxtx7", "spba", "pll8k", "pll11k";
     status = "okay";
 };
+
+&lcdif {
+    status = "okay";
+};

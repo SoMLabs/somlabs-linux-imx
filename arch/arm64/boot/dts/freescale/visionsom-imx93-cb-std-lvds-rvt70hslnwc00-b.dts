@@ -45,13 +45,21 @@
 		};
 	};
 };
-
+/*
 &dphy {
 	status = "disabled";
 };
 
 &dsi {
 	status = "disabled";
+};
+*/
+&dphy {
+        status = "okay";
+};
+
+&dphy_rx {
+        status = "okay";
 };
 
 &ldb_phy {
@@ -68,10 +76,6 @@
 		interrupts = <21 IRQ_TYPE_EDGE_FALLING>;
 		status = "okay";
 	};
-};
-
-&epxp {
-	status = "okay";
 };
 
 &iomuxc {

@@ -4113,7 +4113,7 @@ static const struct panel_desc qishenglong_gopher2b_lcd = {
 };
 
 static const struct display_timing riverdi_rvt70hslnwc00_b_timing = {
-	.pixelclock = { 60000000, 60000000, 60000000 },
+	.pixelclock = { 80000000, 80000000, 80000000 },
 	.hactive = { 1024, 1024, 1024 },
 	.hfront_porch = { 40, 40, 40 },
 	.hback_porch = { 40, 40, 40 },

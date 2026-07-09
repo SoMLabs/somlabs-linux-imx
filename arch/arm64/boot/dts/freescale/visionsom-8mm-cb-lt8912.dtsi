@@ -4,6 +4,8 @@
  *
  */
 
+#include "imx8mm-nxp-display.dtsi"
+
 / {
     /delete-node/ panel-backlight;
 
@@ -38,8 +40,6 @@
 
 &mipi_dsi {
     status = "okay";
-
-    /delete-node/ panel@0;
 
     port@1 {
         mipi_dsi_out: endpoint {

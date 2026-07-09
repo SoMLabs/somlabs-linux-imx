@@ -26,6 +26,26 @@
 	};
 };
 
+&epxp {
+        status = "okay";
+};
+
+&media_blk_ctrl {
+        status = "okay";
+};
+
+&mu1 {
+        status = "okay";
+};
+
+&mu2 {
+        status = "okay";
+};
+
+&lcdif {
+        status = "okay";
+};
+
 &lpi2c1 {
 
 	ov5640: camera@3c {
@@ -85,10 +105,6 @@
 			};
 		};
 	};
-};
-
-&dphy_rx {
-	status = "okay";
 };
 
 &iomuxc {

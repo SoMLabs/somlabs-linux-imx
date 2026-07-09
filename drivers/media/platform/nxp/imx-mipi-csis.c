@@ -677,13 +677,13 @@ static void mipi_csis_set_set_data_clock_polarity(struct mipi_csis_device *csis)
 {
         u32 val = mipi_csis_read(csis, MIPI_CSIS_DPHY_CMN_CTRL);
 
-        val &= ~(MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_CLK | MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_DAT);
+        val &= ~(MIPI_CSIS_DPHY_CMN_CTRL_S_DPDN_SWAP_CLK | MIPI_CSIS_DPHY_CMN_CTRL_S_DPDN_SWAP_DAT);
 
         if(csis->swap_clk)
-                val |= MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_CLK;
+                val |= MIPI_CSIS_DPHY_CMN_CTRL_S_DPDN_SWAP_CLK;
 
         if(csis->swap_data)
-                val |= MIPI_CSIS_DPHY_CMN_CTRL_DPDN_SWAP_DAT;
+                val |= MIPI_CSIS_DPHY_CMN_CTRL_S_DPDN_SWAP_DAT;
 
         mipi_csis_write(csis, MIPI_CSIS_DPHY_CMN_CTRL, val);
 }

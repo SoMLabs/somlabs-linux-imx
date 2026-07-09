@@ -6,8 +6,9 @@
 
 #include <dt-bindings/phy/phy-imx8-pcie.h>
 #include <dt-bindings/pwm/pwm.h>
-
 #include "spacesom-8mplus.dtsi"
+#include "imx8mp-nxp-display.dtsi"
+#include "imx8mp-nxp-capture.dtsi"
 
 / {
         model = "SoMLabs SpaceSOM i.MX8MPlus CB-ADV";
@@ -98,6 +99,28 @@
                         panel_lvds_in: endpoint {
                                 remote-endpoint = <&lvds_out>;
                         };
+                };
+        };
+
+        reserved-memory {
+                #address-cells = <2>;
+                #size-cells = <2>;
+                ranges;
+
+                dsp_vdev0vring0: vdev0vring0@942f0000 {
+                        reg = <0 0x942f0000 0 0x8000>;
+                        no-map;
+                };
+
+                dsp_vdev0vring1: vdev0vring1@942f8000 {
+                        reg = <0 0x942f8000 0 0x8000>;
+                        no-map;
+                };
+
+                dsp_vdev0buffer: vdev0buffer@94300000 {
+                        compatible = "shared-dma-pool";
+                        reg = <0 0x94300000 0 0x100000>;
+                        no-map;
                 };
         };
 
@@ -645,7 +668,7 @@
                 assigned-clock-rates = <24000000>;
                 reset-gpios = <&gpio5 22 GPIO_ACTIVE_LOW>;
                 powerdown-gpios = <&gpio5 23 GPIO_ACTIVE_HIGH>;
-                status = "disabled";
+                status = "okay";
 
                 port {
                         ov5640_mipi_1_ep: endpoint {
@@ -789,3 +812,24 @@
     linux,rs485-enabled-at-boot-time;
     status = "okay";
 };
+
+&dsp_reserved {
+        status = "okay";
+};
+
+&dsp {
+        memory-region = <&dsp_vdev0buffer>, <&dsp_vdev0vring0>,
+                        <&dsp_vdev0vring1>, <&dsp_reserved>;
+        status = "okay";
+};
+
+&mu2 {
+        status = "okay";
+};
+
+/*
+&easrc {
+        fsl,asrc-rate = <48000>;
+        status = "okay";
+};
+*/
