@@ -151,7 +151,7 @@ static void lt8912_audio_config(struct lt8912 *lt)
 static void lt8912_mipi_config(struct lt8912 *lt)
 {
 	const struct drm_display_mode *mode = &lt->mode;
-	u32 hactive, hfp, hsync, hbp, vfp, vsync, vbp, htotal, vtotal;
+	u32 hactive, hfp, hsync, hbp, vactive, vfp, vsync, vbp, htotal, vtotal;
 	unsigned int hsync_activehigh, vsync_activehigh, reg;
 
 	hactive = mode->hdisplay;
@@ -159,6 +159,7 @@ static void lt8912_mipi_config(struct lt8912 *lt)
 	hsync = mode->hsync_end - mode->hsync_start;
 	hsync_activehigh = !!(mode->flags & DRM_MODE_FLAG_PHSYNC);
 	hbp = mode->htotal - mode->hsync_end;
+	vactive = mode->vdisplay;
 	vfp = mode->vsync_start - mode->vdisplay;
 	vsync = mode->vsync_end - mode->vsync_start;
 	vsync_activehigh = !!(mode->flags & DRM_MODE_FLAG_PVSYNC);
@@ -168,7 +169,11 @@ static void lt8912_mipi_config(struct lt8912 *lt)
 
 	/* MIPIDig */
 	regmap_write(lt->regmap[1], 0x10, 0x01);
-	regmap_write(lt->regmap[1], 0x11, 0x0a);
+	if(vactive < 600) {
+		regmap_write(lt->regmap[1], 0x11, 0x04);
+	} else {
+		regmap_write(lt->regmap[1], 0x11, 0x0a);
+	}
 	regmap_write(lt->regmap[1], 0x18, hsync);
 	regmap_write(lt->regmap[1], 0x19, vsync);
 	regmap_write(lt->regmap[1], 0x1c, hactive % 0x100);
@@ -190,12 +195,13 @@ static void lt8912_mipi_config(struct lt8912 *lt)
 	regmap_write(lt->regmap[1], 0x3f, hfp >> 8);
 	regmap_read(lt->regmap[0], 0xab, &reg);
 	reg &= 0xfc;
-	reg |= (hsync_activehigh < 1) | vsync_activehigh;
+	reg |= (hsync_activehigh << 1) | vsync_activehigh;
 	regmap_write(lt->regmap[0], 0xab, reg);
 }
 
 static void lt8912_configure_lvds(struct lt8912 *lt)
 {
+	unsigned int bpc = lt->connector.display_info.bpc;
 	//core pll bypass
 	regmap_write(lt->regmap[0], 0x50, 0x24);//cp=50uA
 	regmap_write(lt->regmap[0], 0x51, 0x2d);//Pix_clk as reference,second order passive LPF PLL
@@ -209,9 +215,18 @@ static void lt8912_configure_lvds(struct lt8912 *lt)
 	regmap_write(lt->regmap[0], 0x04, 0xfb);//core pll reset
 	regmap_write(lt->regmap[0], 0x04, 0xff);
 
-		//scaler bypass
+	//scaler bypass
 	regmap_write(lt->regmap[0], 0x7f, 0x00);//disable scaler
-	regmap_write(lt->regmap[0], 0xa8, 0x13);//0x13 : JEIDA, 0x33:VSEA  bit[1]:H_HOL, bit[0]:V_HOL,
+
+	//0x13 : VESA, 0x33:JEIDA  bit[1]:H_HOL, bit[0]:V_HOL,
+	if(bpc == 8) {
+		regmap_write(lt->regmap[0], 0xa8, 0x13);
+	} else if (bpc == 6) {
+		regmap_write(lt->regmap[0], 0xa8, 0x37);
+	} else {
+		dev_warn(lt->dev, "Unsupported panel bpc=%u; setting to 8\n", bpc);
+		regmap_write(lt->regmap[0], 0xa8, 0x13);
+	}
 
 	regmap_write(lt->regmap[0], 0x02, 0xf7);	//lvds pll reset
 	regmap_write(lt->regmap[0], 0x02, 0xff);
@@ -259,7 +274,11 @@ static void lt8912_init(struct lt8912 *lt)
 	regmap_write(lt->regmap[0], 0x3b, 0x00);
 
 		/* HDMIPllAnalog */
-	regmap_write(lt->regmap[0], 0x44, 0x31);
+	if (lt->lvds_enabled) {
+		regmap_write(lt->regmap[0], 0x44, 0x30);
+	} else {
+		regmap_write(lt->regmap[0], 0x44, 0x31);
+	}
 	regmap_write(lt->regmap[0], 0x55, 0x44);
 	regmap_write(lt->regmap[0], 0x57, 0x01);
 	regmap_write(lt->regmap[0], 0x5a, 0x02);
@@ -393,7 +412,9 @@ static int lt8912_connector_get_modes(struct drm_connector *connector)
 
 	// If LVDS is enabled force the LVDS resolution and mode to both displays
 	if (lt->lvds_enabled) {
-		ret = drm_panel_get_modes(lt->lvds_panel, connector);
+		num_modes = drm_panel_get_modes(lt->lvds_panel, connector);
+		if (num_modes < 0)
+			return num_modes;
 	} else {
 
 		/* Check if optional DDC I2C bus should be used. */
@@ -602,10 +623,6 @@ static int lt8912_bridge_attach(struct drm_bridge *bridge, struct drm_encoder *e
 	drm_connector_helper_add(connector, &lt8912_connector_helper_funcs);
 	drm_connector_attach_encoder(connector, bridge->encoder);
 
-	if(lt->lvds_enabled) {
-		drm_bridge_attach(bridge->encoder, &lt->bridge, bridge, flags);
-	}
-
 	ret = lt8912_attach_dsi(lt);
 
 	connector->funcs->reset(connector);
@@ -761,6 +778,8 @@ static int lt8912_probe(struct i2c_client *i2c)
 	ret = lt8912_i2c_init(lt, i2c);
 	if (ret)
 		return ret;
+
+	i2c_set_clientdata(i2c, lt);
 
 	/* TODO: interrupt handing */
 
