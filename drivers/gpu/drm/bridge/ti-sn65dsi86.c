@@ -17,6 +17,7 @@
 #include <linux/module.h>
 #include <linux/of_graph.h>
 #include <linux/pm_runtime.h>
+#include <linux/property.h>
 #include <linux/pwm.h>
 #include <linux/regmap.h>
 #include <linux/regulator/consumer.h>
@@ -210,6 +211,7 @@ struct ti_sn65dsi86 {
 	bool				hpd_enabled;
 	struct mutex			comms_mutex;
 	struct mutex			hpd_mutex;
+	bool				no_hpd;
 
 #if defined(CONFIG_OF_GPIO)
 	struct gpio_chip		gchip;
@@ -384,17 +386,9 @@ static void ti_sn65dsi86_enable_comms(struct ti_sn65dsi86 *pdata,
 	 * that instead of looking at HPD you could just hardcode a delay of
 	 * 200 ms.  We'll assume that the panel driver will have the hardcoded
 	 * delay in its prepare and always disable HPD.
-	 *
-	 * For DisplayPort bridge type, we need HPD. So we use the bridge type
-	 * to conditionally disable HPD.
-	 * NOTE: The bridge type is set in ti_sn_bridge_probe() but enable_comms()
-	 * can be called before. So for DisplayPort, HPD will be enabled once
-	 * bridge type is set. We are using bridge type instead of "no-hpd"
-	 * property because it is not used properly in devicetree description
-	 * and hence is unreliable.
 	 */
 
-	if (pdata->bridge.type != DRM_MODE_CONNECTOR_DisplayPort)
+	if (pdata->no_hpd || pdata->bridge.type != DRM_MODE_CONNECTOR_DisplayPort)
 		regmap_update_bits(pdata->regmap, SN_HPD_DISABLE_REG, HPD_DISABLE,
 				   HPD_DISABLE);
 
@@ -1246,17 +1240,23 @@ ti_sn_bridge_detect(struct drm_bridge *bridge, struct drm_connector *connector)
 	struct ti_sn65dsi86 *pdata = bridge_to_ti_sn65dsi86(bridge);
 	int val = 0;
 
+	if (pdata->no_hpd) {
+		if (pdata->next_bridge && pdata->next_bridge->funcs &&
+				pdata->next_bridge->funcs->detect)
+			return pdata->next_bridge->funcs->detect(
+					pdata->next_bridge, connector);
+
+		return connector_status_unknown;
+	}
+
 	/*
 	 * Runtime reference is grabbed in ti_sn_bridge_hpd_enable()
 	 * as the chip won't report HPD just after being powered on.
-	 * HPD_DEBOUNCED_STATE reflects correct state only after the
-	 * debounce time (~100-400 ms).
 	 */
-
 	regmap_read(pdata->regmap, SN_HPD_DISABLE_REG, &val);
 
 	return val & HPD_DEBOUNCED_STATE ? connector_status_connected
-					 : connector_status_disconnected;
+		: connector_status_disconnected;
 }
 
 static const struct drm_edid *ti_sn_bridge_edid_read(struct drm_bridge *bridge,
@@ -1451,6 +1451,8 @@ static int ti_sn_bridge_probe(struct auxiliary_device *adev,
 		return dev_err_probe(&adev->dev, PTR_ERR(pdata->next_bridge),
 				     "failed to create panel bridge\n");
 
+	pdata->no_hpd = device_property_read_bool(&adev->dev, "no-hpd");
+
 	ti_sn_bridge_parse_lanes(pdata, np);
 
 	ret = ti_sn_bridge_parse_dsi_host(pdata);
@@ -1477,7 +1479,7 @@ static int ti_sn_bridge_probe(struct auxiliary_device *adev,
 		 * for eDP.
 		 */
 		mutex_lock(&pdata->comms_mutex);
-		if (pdata->comms_enabled)
+		if (pdata->comms_enabled && !pdata->no_hpd)
 			regmap_update_bits(pdata->regmap, SN_HPD_DISABLE_REG,
 					   HPD_DISABLE, 0);
 		mutex_unlock(&pdata->comms_mutex);
