@@ -181,6 +181,9 @@ struct rtl821x_priv {
 	u16 iner;
 };
 
+static int rtl8211f_led_hw_control_set(struct phy_device *phydev, u8 index,
+                                       unsigned long rules);
+
 static int rtl821x_read_page(struct phy_device *phydev)
 {
 	return __phy_read(phydev, RTL821x_PAGE_SELECT);
@@ -672,6 +675,7 @@ static int rtl8211f_config_phy_eee(struct phy_device *phydev)
 static int rtl8211f_config_init(struct phy_device *phydev)
 {
 	struct device *dev = &phydev->mdio.dev;
+	unsigned long ledrules = 0;
 	int ret;
 
 	ret = rtl8211f_config_aldps(phydev);
@@ -691,6 +695,11 @@ static int rtl8211f_config_init(struct phy_device *phydev)
 			ERR_PTR(ret));
 		return ret;
 	}
+
+	set_bit(TRIGGER_NETDEV_LINK_10, &ledrules);
+	set_bit(TRIGGER_NETDEV_LINK_100, &ledrules);
+	set_bit(TRIGGER_NETDEV_LINK_1000, &ledrules);
+	rtl8211f_led_hw_control_set(phydev, 0, ledrules);
 
 	return rtl8211f_config_phy_eee(phydev);
 }
